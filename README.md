@@ -16,9 +16,15 @@ Prerequisites
 -------------
 
 You need a few things before you can start working on DataMapper itself.
-Namely [rvm](http://rvm.beginrescueend.com/) and
+Namely [ruby-github](https://rubygems.org/gems/ruby-github),
+[bundler](http://github.com/carlhuda/bundler),
+[rvm](http://rvm.beginrescueend.com/) and
 [thor](http://github.com/wycats/thor). Once you have those, you need to
 install the thor tasks and you're ready to go.
+
+To install ruby-github and bundler just run:
+
+    gem install bundler ruby-github
 
 Installing rvm
 --------------
