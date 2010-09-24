@@ -49,10 +49,10 @@ systemwide.
     cd dm-dev
     thor install tasks.rb
 
-After showing you the content of dev_tasks.rb, thor will ask you for a
+After showing you the content of tasks.rb, thor will ask you for a
 namespace for those new tasks.
 
-    Please specify a name for dev_tasks.rb in the system repository [tasks.rb]:
+    Please specify a name for tasks.rb in the system repository [tasks.rb]:
 
 You can choose any name at that prompt, or you can just hit enter to
 accept the default. The provided thor tasks explicitly define their
@@ -161,7 +161,7 @@ option hash in the future.
 
 The following IRB session demonstrate a typical workflow. The API used in this session can also be invoked via system wide thor tasks.
 
-    ree-1.8.7-2010.02@datamapper mungo:dm-dev snusnu$ irb -r dev_tasks.rb
+    ree-1.8.7-2010.02@datamapper mungo:dm-dev snusnu$ irb -r tasks.rb
     ree > DM.sync
     <GitHub::User name="DataMapper">
     [01/38] Pulling dm-core
@@ -283,7 +283,7 @@ The following IRB session demonstrate a typical workflow. The API used in this s
     [38/38] [1.9.2] bundle install dm-dev SKIPPED - because it's ignored
      => nil
     ree > exit
-    ree-1.8.7-2010.02@datamapper mungo:dm-dev snusnu$ RUBIES=1.8.7,1.9.2 INCLUDE=dm-validations ADAPTERS=sqlite,postgres,mysql irb -r dev_tasks.rb
+    ree-1.8.7-2010.02@datamapper mungo:dm-dev snusnu$ RUBIES=1.8.7,1.9.2 INCLUDE=dm-validations ADAPTERS=sqlite,postgres,mysql irb -r tasks.rb
     ree > DM.sync
     <GitHub::User name="DataMapper">
     [1/1] Pulling dm-validations
