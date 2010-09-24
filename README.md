@@ -105,6 +105,11 @@ untouched.
 
 The spec task uses the bundled DM sources to run the specs for all specified gems against all specified rubies and adapters. While running, it prints out a matrix, that shows for every ruby and every adapter if the specs `pass` or `fail`.
 
+Note that for the specs to reliably work, you should sync and install
+*all* DM repositories once. This is necessary because some gems might
+depend on other DM gems and since we're running all specs with local
+code, we need to make sure that this code is available.
+
 ## Common options
 
 Every task can be configured with a few environment variables. The rubies to use can be altered by passing something like `RUBIES=1.8.7,1.9.2,rbx`. When given, `INCLUDE=dm-core,dm-validations` will make sure that only these two gems are used. When `INCLUDE` is left out, *all* (not ignored) gems will be used. Passing `EXCLUDE=dm-tags,dm-is-tree` will use all but those two gems.
