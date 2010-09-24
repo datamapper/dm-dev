@@ -15,19 +15,9 @@ you're working on a patch that affects multiple DataMapper gems.
 Prerequisites
 -------------
 
-You need a few things before you can start working on DataMapper itself.
-Namely [ruby-github](https://rubygems.org/gems/ruby-github),
-[bundler](http://github.com/carlhuda/bundler),
-[rvm](http://rvm.beginrescueend.com/) and
-[thor](http://github.com/wycats/thor). Once you have those, you need to
-install the thor tasks and you're ready to go.
+You need to have [rvm](http://rvm.beginrescueend.com/), [bundler](http://github.com/carlhuda/bundler), [thor](http://github.com/wycats/thor), [ruby-github](https://rubygems.org/gems/ruby-github) and [addressable](http://addressable.rubyforge.org/) available on your machine.
 
-To install ruby-github and bundler just run:
-
-    gem install bundler ruby-github
-
-Installing rvm
---------------
+### Installing rvm
 
 The awesome rvm comes as a gem and makes installing and using different
 rubies a breeze. Be aware that the following commands may take quite
@@ -39,18 +29,22 @@ some time, depending on your machine.
     rvm install jruby # Bonus points for running on jruby
     rvm install rbx   # Bonus points for running on rbx
 
-Reading through rvm's detailed [documentation]((http://rvm.beginrescueend.com/)
+Reading through rvm's detailed [documentation](http://rvm.beginrescueend.com/)
 is definitely time well spent too.
 
-Installing thor and the DataMapper tasks
-----------------------------------------
+### Installing the required gems
 
-Thor is yet another rubygem, providing a nice framework for writing
-system wide thor tasks or ruby executables. Install it like you would
-with any other rubygem, then clone the DataMapper tasks and install them
-systemwide.
+    gem install bundler thor addressable ruby-github
 
-    gem install thor
+Once those are installed, you have all you need for the DataMapper thor tasks
+to work.
+
+Installing the DataMapper thor tasks
+------------------------------------
+
+Currently, you need to clone the github repo containing the tasks and
+then install them like you would install any thor task.
+
     git clone git://github.com/datamapper/dm-dev.git
     cd dm-dev
     thor install tasks.rb
@@ -61,9 +55,24 @@ namespace for those new tasks.
     Please specify a name for tasks.rb in the system repository [tasks.rb]:
 
 You can choose any name at that prompt, or you can just hit enter to
-accept the default. The provided thor tasks explicitly define their
-namespace to be 'dm'.
+accept the default. All provided thor tasks are available below the `dm`
+namespace.
 
+Verify the installation by printing a list of available thor tasks to
+your screen.
+
+    ree-1.8.7-2010.02@datamapper mungo:dm-dev snusnu$ thor -T
+    dm
+    --
+    thor dm:bundle:install  # Bundle the DM repositories
+    thor dm:bundle:update   # Update the bundled DM repositories
+    thor dm:implode         # Delete all DM gems
+    thor dm:release         # Release all DM gems to rubygems
+    thor dm:spec            # Run specs for DM gems
+    thor dm:sync            # Sync with the DM repositories
+
+If everything went fine, you should see the above list of available
+commands (among any other thor tasks you might have installed already).
 
 ## dm-dev
 
