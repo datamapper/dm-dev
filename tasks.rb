@@ -501,10 +501,6 @@ class ::Project
 
       end
 
-      def environment(ruby)
-        "#{super} TZ='utc'"
-      end
-
       def bundle_command
         'exec rake spec'
       end
@@ -664,7 +660,7 @@ module DataMapper
       end
 
       def environment(ruby)
-        "#{super} #{support_lib(ruby)} ADAPTER='#{@adapter}'"
+        "#{super} #{support_lib(ruby)} ADAPTER='#{@adapter}' TZ='utc'"
       end
 
       def local_install?
