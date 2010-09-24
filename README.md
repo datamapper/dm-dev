@@ -80,7 +80,7 @@ The following describes the new DM development tasks and shows how you can use t
 
 ## Totally isolated
 
-The following tasks don't affect the system gems *at all*. Nor do they mess with any rvm ruby specific (system)gem(set). By default, *everything* will be bundled below `"#{Dir.pwd}/BUNDLE_ROOT"`, you can alter the install location by passing the `BUNDLE_ROOT=/path/to/bundle/root` ENV var. `BUNDLE_ROOT` contains separate folders for every ruby in use.
+The following tasks don't affect the system gems *at all*. Nor do they mess with any rvm ruby specific (system)gem(set). By default, *everything* will be bundled below `"#{Dir.pwd}/DM_BUNDLE_ROOT"`, you can alter the install location by passing the `BUNDLE_ROOT=/path/to/bundle/root` ENV var. `BUNDLE_ROOT` contains separate folders for every ruby in use.
 
 This means that once all dependencies are bundled for any given ruby, there's no need to clean anything between spec runs. Also, no re-bundling needs to happen before spec runs since everything is already bundled. Of course, the bundles can be updated manually, to ensure that the code under test is up to date. In the near future, a command that tells you exactly which repos need updating, will be included.
 

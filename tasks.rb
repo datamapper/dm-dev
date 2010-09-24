@@ -178,7 +178,7 @@ class ::Project
     end
 
     def default_bundle_root
-      'BUNDLE_ROOT'
+      'DM_BUNDLE_ROOT'
     end
 
     def default_included
