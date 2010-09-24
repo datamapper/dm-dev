@@ -429,7 +429,7 @@ class ::Project
       end
 
       def environment(ruby)
-        "ROOT=#{env.root} BUNDLE_PATH='#{bundle_path(ruby)}' BUNDLE_GEMFILE='#{gemfile(ruby)}'"
+        "BUNDLE_PATH='#{bundle_path(ruby)}' BUNDLE_GEMFILE='#{gemfile(ruby)}'"
       end
 
       def bundle_path(ruby)
