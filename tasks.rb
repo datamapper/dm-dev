@@ -9,7 +9,7 @@ require 'thor'
 require 'addressable/uri'
 require 'ruby-github'
 
-class Project
+class ::Project
 
   def self.command_names
     %w[ sync bundle:install bundle:update spec release implode]
