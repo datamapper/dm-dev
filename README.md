@@ -95,6 +95,56 @@ The spec task uses the bundled DM sources to run the specs for all specified gem
 Every task can be configured with a few environment variables. The rubies to use can be altered by passing something like `RUBIES=1.8.7,1.9.2,rbx`. When given, `INCLUDE=dm-core,dm-validations` will make sure that only these two gems are used. When `INCLUDE` is left out, *all* (not ignored) gems will be used. Passing `EXCLUDE=dm-tags,dm-is-tree` will use all but those two gems.
 
 
+## The available thor tasks
+
+    thor dm:sync           # --verbose # -v
+    thor dm:bundle:install # --verbose # -v
+    thor dm:bundle:update  # --verbose # -v
+    thor dm:spec           # --verbose # -v
+    thor dm:implode        # --verbose # -v
+
+## Example thor session
+
+    ree-1.8.7-2010.02@datamapper mungo:dm-dev snusnu$ thor -T
+    dm
+    --
+    thor dm:bundle:install  # Bundle the DM repositories
+    thor dm:bundle:update   # Update the bundled DM repositories
+    thor dm:implode         # Delete all DM gems
+    thor dm:release         # Release all DM gems to rubygems
+    thor dm:spec            # Run specs for DM gems
+    thor dm:sync            # Sync with the DM repositories
+
+    ree-1.8.7-2010.02@datamapper mungo:dm-dev snusnu$ INCLUDE=dm-validations thor dm:sync
+    <GitHub::User name="DataMapper">
+    [1/1] Cloning dm-validations
+
+    ree-1.8.7-2010.02@datamapper mungo:dm-dev snusnu$ INCLUDE=dm-validations thor dm:sync
+    <GitHub::User name="DataMapper">
+    [1/1] Pulling dm-validations
+
+    ree-1.8.7-2010.02@datamapper mungo:dm-dev snusnu$ INCLUDE=dm-validations thor dm:implode
+    <GitHub::User name="DataMapper">
+    [1/1] Deleting dm-validations
+
+    ree-1.8.7-2010.02@datamapper mungo:dm-dev snusnu$ INCLUDE=dm-validations thor dm:sync
+    <GitHub::User name="DataMapper">
+    [1/1] Cloning dm-validations
+
+    ree-1.8.7-2010.02@datamapper mungo:dm-dev snusnu$ INCLUDE=dm-validations thor dm:bundle:install
+    <GitHub::User name="DataMapper">
+    [1/1] [1.8.7] bundle install dm-validations
+    [1/1] [1.9.2] bundle install dm-validations
+
+    ree-1.8.7-2010.02@datamapper mungo:dm-dev snusnu$ INCLUDE=dm-validations thor dm:spec
+    <GitHub::User name="DataMapper">
+
+    h2. dm-validations
+
+    | RUBY  | in_memory | yaml | sqlite | postgres | mysql |
+    | 1.8.7 | pass | pass | pass | pass | pass |
+    | 1.9.2 | pass | pass | pass | pass | pass |
+
 ## The available ruby API
 
 Currently, environment variables are the only way to configure these API
@@ -107,15 +157,7 @@ option hash in the future.
     DM.spec           # :verbose => false
     DM.implode        # :verbose => false
 
-## The available thor tasks
-
-    thor dm:sync           # --verbose # -v
-    thor dm:bundle:install # --verbose # -v
-    thor dm:bundle:update  # --verbose # -v
-    thor dm:spec           # --verbose # -v
-    thor dm:implode        # --verbose # -v
-
-## IRB session
+## Example IRB session
 
 The following IRB session demonstrate a typical workflow. The API used in this session can also be invoked via system wide thor tasks.
 
