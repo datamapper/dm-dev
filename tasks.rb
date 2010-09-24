@@ -678,7 +678,7 @@ module DataMapper
 
       namespace :dm
 
-      class_option :verbose => :boolean, :default => false
+      class_option :verbose, :default => false, :aliases => '-v'
 
       desc 'sync', 'Sync with the DM repositories'
       def sync

@@ -96,11 +96,11 @@ option hash in the future.
 
 ## The available thor tasks
 
-    thor dm:sync
-    thor dm:bundle:install
-    thor dm:bundle:update
-    thor dm:spec
-    thor dm:implode
+    thor dm:sync           # --verbose # -v
+    thor dm:bundle:install # --verbose # -v
+    thor dm:bundle:update  # --verbose # -v
+    thor dm:spec           # --verbose # -v
+    thor dm:implode        # --verbose # -v
 
 ## IRB session
 
