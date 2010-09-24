@@ -73,6 +73,19 @@ The tasks make sure that you're always testing against local sources. This is ve
 
 To achieve this, the bundle tasks first create a `Gemfile.local` for every repository that includes a Gemfile (or isn't otherwise ignored), and then copies that file to `Gemfile.ruby_version.local` where *ruby_version* is any of the specified rubies to use. This is done because bundler automatically creates a `Gemfile.lock` after `bundle install`. In our case that leaves us with files like `Gemfile.1.9.2.local` and `Gemfile.1.9.2.local.lock`. That's necessary, because otherwise bundler confuses the the `BUNDLE_PATH` to use. Every command executed by the bundle tasks explicitly passes `BUNDLE_PATH=/path/to/BUNDLE_ROOT/ruby_version` and `BUNDLE_GEMFILE=/path/to/Gemfile.ruby_version.local` as environment variables, to make sure that the right (local) bundle is used.
 
+## Remove all traces easily
+
+Since the complete DM development environment is located in one single
+folder, it's easy to get rid of it any time. Apart from obviously just
+deleting the folder, you can use `thor dm:implode` just for the fun of
+it.
+
+When the `INCLUDE` environment variable *is not specified*, all repositories will be deleted as well as the `BUNDLE_ROOT`, meaning that you will have to re-bundle everything next time.
+
+When the `INCLUDE` environment variable *is specified*, only the
+specified repositories will be deleted. The `BUNDLE_ROOT` stays
+untouched.
+
 ## Running specs
 
 The spec task uses the bundled DM sources to run the specs for all specified gems against all specified rubies and adapters. While running, it prints out a matrix, that shows for every ruby and every adapter if the specs `pass` or `fail`.
