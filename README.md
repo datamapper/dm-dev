@@ -47,12 +47,12 @@ systemwide.
     gem install thor
     git clone git://github.com/datamapper/dm-dev.git
     cd dm-dev
-    thor install dev_tasks.rb
+    thor install tasks.rb
 
 After showing you the content of dev_tasks.rb, thor will ask you for a
 namespace for those new tasks.
 
-    Please specify a name for dev_tasks.rb in the system repository [dev_tasks.rb]:
+    Please specify a name for dev_tasks.rb in the system repository [tasks.rb]:
 
 You can choose any name at that prompt, or you can just hit enter to
 accept the default. The provided thor tasks explicitly define their
