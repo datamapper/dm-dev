@@ -681,11 +681,6 @@ module DataMapper
         DataMapper::Project.sync(options)
       end
 
-      desc 'bundle', 'Bundle the DM repositories'
-      def bundle
-        DataMapper::Project.bundle(options)
-      end
-
       desc 'spec', 'Run specs for DM gems'
       def spec
         DataMapper::Project.spec(options)
@@ -694,6 +689,27 @@ module DataMapper
       desc 'release', 'Release all DM gems to rubygems'
       def release
         DataMapper::Project.release(options)
+      end
+
+      desc 'implode', 'Delete all DM gems'
+      def implode
+        DataMapper::Project.implode(options)
+      end
+
+      class Bundle < ::Thor
+
+        namespace 'dm:bundle'
+
+        desc 'install', 'Bundle the DM repositories'
+        def install
+          DataMapper::Project.bundle_install(options)
+        end
+
+        desc 'update', 'Update the bundled DM repositories'
+        def update
+          DataMapper::Project.bundle_update(options)
+        end
+
       end
 
     end
