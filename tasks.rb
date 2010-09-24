@@ -443,7 +443,7 @@ class ::Project
       def make_gemfile(ruby)
         gemfile = working_dir.join(gemfile(ruby))
         unless gemfile.file?
-          FileUtils.cp(working_dir.join('Gemfile.local'), working_dir.join(gemfile(ruby)))
+          FileUtils.cp(working_dir.join('Gemfile.local'), gemfile)
         end
       end
 
