@@ -15,7 +15,7 @@ you're working on a patch that affects multiple DataMapper gems.
 Prerequisites
 -------------
 
-You need to have [rvm](http://rvm.beginrescueend.com/), [bundler](http://github.com/carlhuda/bundler), [thor](http://github.com/wycats/thor), [ruby-github](https://rubygems.org/gems/ruby-github) and [addressable](http://addressable.rubyforge.org/) available on your machine.
+You need to have [rvm](http://rvm.beginrescueend.com/), [bundler](http://github.com/carlhuda/bundler), [thor](http://github.com/wycats/thor), [ruby-github](https://rubygems.org/gems/ruby-github), [addressable](http://addressable.rubyforge.org/) and [jeweler](http://github.com/technicalpickles/jeweler) available on your machine.
 
 ### Installing rvm
 
@@ -31,6 +31,15 @@ some time, depending on your machine.
 
 Reading through rvm's detailed [documentation](http://rvm.beginrescueend.com/)
 is definitely time well spent too.
+
+Currently, you need to manually make sure that jeweler is installed into any of the rubies you plan to use. This is because the DataMapper rake tasks depend on jeweler and we have to invoke them *before* we can enter a bundled environment.
+
+To install jeweler into multiple rubies, run the following command
+
+    rvm 1.8.7,1.9.2,jruby,rbx gem install jeweler
+
+In the future, there might be a task that will handle this
+transparently.
 
 ### Installing the required gems
 
