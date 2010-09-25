@@ -700,6 +700,8 @@ module DataMapper
 
         namespace 'dm:bundle'
 
+        class_option :verbose, :default => false, :aliases => '-v'
+
         desc 'install', 'Bundle the DM repositories'
         def install
           DataMapper::Project.bundle_install(options)
