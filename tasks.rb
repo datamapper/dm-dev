@@ -618,7 +618,7 @@ module DataMapper
       end
 
       def local_install?(ruby)
-        working_dir.join(gemfile(ruby)).file?
+        working_dir.join("Gemfile.#{ruby}.local").file?
       end
 
       def ignored_repos
