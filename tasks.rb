@@ -36,7 +36,7 @@ class ::Project
       def #{command_name(name)}
         self.class.invoke :before, '#{command_name(name)}', env, repos
         @repos.each_with_index do |repo, index|
-          @logger.next_command
+          @logger.progress!
           command_class('#{name}').new(repo, env, @logger, options[:verbose]).run
         end
         self.class.invoke :after, '#{command_name(name)}', env, repos
@@ -203,23 +203,25 @@ class ::Project
 
   class Logger
 
+    attr_reader :progress
+
     def initialize(repo_count, verbose)
-      @total   = repo_count
-      @padding = @total.to_s.length
-      @index   = 0
-      @verbose = verbose
+      @progress = 0
+      @total    = repo_count
+      @padding  = @total.to_s.length
+      @verbose  = verbose
     end
 
     def log(repo, action, command = nil, msg = nil)
       puts '[%0*d/%d] %s %s %s%s' % format(repo, action, command, msg)
     end
 
-    def next_command
-      @index += 1
+    def progress!
+      @progress += 1
     end
 
     def format(repo, action, command, msg)
-      [ @padding, @index, @total, action, repo.name, msg, @verbose ? ": #{command}" : '' ]
+      [ @padding, @progress, @total, action, repo.name, msg, @verbose ? ": #{command}" : '' ]
     end
 
   end
