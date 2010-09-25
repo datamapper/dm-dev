@@ -561,6 +561,7 @@ module DataMapper
     def initialize(options = {})
       super
       commands['bundle:install'] = DataMapper::Project::Bundle::Install
+      commands['bundle:update' ] = DataMapper::Project::Bundle::Update
       commands['spec']           = DataMapper::Project::Spec
     end
 
@@ -642,6 +643,13 @@ module DataMapper
         end
 
       end
+
+      class Update < ::Project::Command::Bundle::Update
+
+        include DataMapper::Project::Bundle
+
+      end
+
 
     end
 
