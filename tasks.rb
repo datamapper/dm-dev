@@ -473,10 +473,6 @@ class ::Project
 
     class Spec < Bundle
 
-      def initialize(repo, env, logger, verbose = false)
-        super
-      end
-
       def run
 
         puts "\nh2. %s\n\n" % repo.name
