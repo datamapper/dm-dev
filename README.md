@@ -165,6 +165,11 @@ Every task can be configured with a few environment variables. The rubies to use
     [1/1] [1.8.7] bundle install dm-validations
     [1/1] [1.9.2] bundle install dm-validations
 
+    ree-1.8.7-2010.02@datamapper mungo:dm-dev snusnu$ INCLUDE=dm-validations thor dm:bundle:update
+    <GitHub::User name="DataMapper">
+    [1/1] [1.8.7] bundle update dm-validations
+    [1/1] [1.9.2] bundle update dm-validations
+
     ree-1.8.7-2010.02@datamapper mungo:dm-dev snusnu$ RUBIES=1.8.7,1.9.2,jruby,rbx-1.1.0 INCLUDE=dm-constraints,dm-validations thor dm:spec
     <GitHub::User name="DataMapper">
 
