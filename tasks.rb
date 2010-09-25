@@ -601,6 +601,10 @@ module DataMapper
 
     module Bundle
 
+      def environment(ruby)
+        "#{super} #{support_lib(ruby)} ADAPTERS='#{adapters(ruby)}'"
+      end
+
       def support_lib(ruby)
         ruby == '1.8.6' ? 'EXTLIB="true"' : ''
       end
@@ -610,7 +614,11 @@ module DataMapper
       end
 
       def gemfile(ruby)
-        "#{super}#{local_install? ? '.local' : ''}"
+        "#{super}#{local_install?(ruby) ? '.local' : ''}"
+      end
+
+      def local_install?(ruby)
+        working_dir.join(gemfile(ruby)).file?
       end
 
       def ignored_repos
@@ -625,16 +633,8 @@ module DataMapper
 
         include DataMapper::Project::Bundle
 
-        def environment(ruby)
-          "#{super} #{support_lib(ruby)} ADAPTERS='#{adapters(ruby)}'"
-        end
-
         def before
-          @local_install = system "rake local_gemfile #{verbosity}"
-        end
-
-        def local_install?
-          @local_install
+          system "rake local_gemfile #{verbosity}"
         end
 
         def options
