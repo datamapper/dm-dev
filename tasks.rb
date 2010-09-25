@@ -637,6 +637,10 @@ module DataMapper
           @local_install
         end
 
+        def options
+          '--without quality'
+        end
+
       end
 
     end
