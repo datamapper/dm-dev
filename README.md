@@ -165,14 +165,24 @@ Every task can be configured with a few environment variables. The rubies to use
     [1/1] [1.8.7] bundle install dm-validations
     [1/1] [1.9.2] bundle install dm-validations
 
-    ree-1.8.7-2010.02@datamapper mungo:dm-dev snusnu$ INCLUDE=dm-validations thor dm:spec
+    ree-1.8.7-2010.02@datamapper mungo:dm-dev snusnu$ RUBIES=1.8.7,1.9.2,jruby,rbx-1.1.0 INCLUDE=dm-constraints,dm-validations thor dm:spec
     <GitHub::User name="DataMapper">
+
+    h2. dm-constraints
+
+    | RUBY  | in_memory | yaml | sqlite | postgres | mysql |
+    | 1.8.7 | pass | pass | pass | pass | pass |
+    | 1.9.2 | pass | pass | pass | pass | pass |
+    | jruby | pass | pass | pass | pass | pass |
+    | rbx-1.1.0 | pass | pass | pass | pass | pass |
 
     h2. dm-validations
 
     | RUBY  | in_memory | yaml | sqlite | postgres | mysql |
     | 1.8.7 | pass | pass | pass | pass | pass |
     | 1.9.2 | pass | pass | pass | pass | pass |
+    | jruby | pass | pass | pass | pass | pass |
+    | rbx-1.1.0 | pass | pass | pass | pass | pass |
 
 ## The available ruby API
 
