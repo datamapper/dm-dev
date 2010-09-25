@@ -37,7 +37,7 @@ class ::Project
         self.class.invoke :before, '#{command_name(name)}', env, repos
         @repos.each do |repo|
           @logger.progress!
-          command_class('#{name}').new(repo, env, @logger, options[:verbose]).run
+          command_class('#{name}').new(repo, env, @logger).run
         end
         self.class.invoke :after, '#{command_name(name)}', env, repos
       end
@@ -53,7 +53,7 @@ class ::Project
 
   def initialize(options = {})
     @options  = options
-    @env      = environment_class.new(name)
+    @env      = environment_class.new(name, @options)
     @root     = @env.root
     @repos    = Repositories.new(@root, name, @env.included, @env.excluded + excluded_repos)
     @logger   = Logger.new(@repos.count, @options[:verbose])
@@ -162,19 +162,22 @@ class ::Project
   class Environment
 
     attr_reader :name
+    attr_reader :options
     attr_reader :root
     attr_reader :included
     attr_reader :excluded
     attr_reader :rubies
     attr_reader :bundle_root
 
-    def initialize(name)
+    def initialize(name, options)
       @name        = name
-      @root        = Pathname(ENV['DM_DEV_ROOT']        || Dir.pwd)
-      @bundle_root = Pathname(ENV['DM_DEV_BUNDLE_ROOT'] || @root.join(default_bundle_root))
-      @included    = ENV['INCLUDE'] ? normalize(ENV['INCLUDE']) : default_included
-      @excluded    = ENV['EXCLUDE'] ? normalize(ENV['EXCLUDE']) : default_excluded
-      @rubies      = ENV['RUBIES' ] ? normalize(ENV['RUBIES' ]) : default_rubies
+      @options     = options
+      @root        = Pathname(@options[:root       ] || ENV['DM_DEV_ROOT'       ]     || Dir.pwd)
+      @bundle_root = Pathname(@options[:bundle_root] || ENV['DM_DEV_BUNDLE_ROOT']     || @root.join(default_bundle_root))
+      @included    = @options[:include] || (ENV['INCLUDE'] ? normalize(ENV['INCLUDE'])  : default_included)
+      @excluded    = @options[:exclude] || (ENV['EXCLUDE'] ? normalize(ENV['EXCLUDE'])  : default_excluded)
+      @rubies      = @options[:rubies ] || (ENV['RUBIES' ] ? normalize(ENV['RUBIES' ])  : default_rubies)
+      @verbose     = @options[:verbose] || (ENV['VERBOSE'] == 'true')
     end
 
     def default_bundle_root
@@ -191,6 +194,10 @@ class ::Project
 
     def default_rubies
       %w[ 1.8.7 1.9.2 ]
+    end
+
+    def verbose?
+      @verbose
     end
 
   private
@@ -235,14 +242,14 @@ class ::Project
     attr_reader :uri
     attr_reader :logger
 
-    def initialize(repo, env, logger, verbose = false)
+    def initialize(repo, env, logger)
       @repo    = repo
       @env     = env
       @root    = @env.root
       @path    = @root.join(@repo.name)
       @uri     = @repo.uri
       @logger  = logger
-      @verbose = verbose
+      @verbose = @env.verbose?
     end
 
     def before
@@ -286,18 +293,18 @@ class ::Project
 
     class Sync < Command
 
-      def self.new(repo, env, logger, verbose = false)
+      def self.new(repo, env, logger)
         return super unless self == Sync
         if env.root.join(repo.name).directory?
-          Pull.new(repo, env, logger, verbose)
+          Pull.new(repo, env, logger)
         else
-          Clone.new(repo, env, logger, verbose)
+          Clone.new(repo, env, logger)
         end
       end
 
       attr_reader :git_uri
 
-      def initialize(repo, env, logger, verbose = false)
+      def initialize(repo, env, logger)
         super
         @git_uri = uri.dup
         @git_uri.scheme = scheme
@@ -348,7 +355,7 @@ class ::Project
 
       attr_reader :rubies
 
-      def initialize(repo, env, logger, verbose = false)
+      def initialize(repo, env, logger)
         super
         @rubies = env.rubies
       end
@@ -399,7 +406,7 @@ class ::Project
 
       end
 
-      def initialize(repo, env, logger, verbose = false)
+      def initialize(repo, env, logger)
         super
         @bundle_root = env.bundle_root
         rubies.each { |ruby| bundle_path(ruby).mkpath }
@@ -583,9 +590,9 @@ module DataMapper
 
       attr_reader :adapters
 
-      def initialize(name)
+      def initialize(name, options)
         super
-        @adapters ||= ENV['ADAPTERS'] ? normalize(ENV['ADAPTERS']) : default_adapters
+        @adapters ||= options[:adapters] || (ENV['ADAPTERS'] ? normalize(ENV['ADAPTERS']) : default_adapters)
       end
 
       def default_adapters
@@ -678,9 +685,23 @@ module DataMapper
     # The tasks
     class Tasks < ::Thor
 
+      module CommonOptions
+        def self.included(host)
+          host.class_eval do
+            class_option :root,        :type => :string,  :aliases => '-r', :desc => 'The directory where all DM source code is stored (overwrites DM_DEV_ROOT)'
+            class_option :bundle_root, :type => :string,  :aliases => '-B', :desc => 'The directory where bundler stores all its data (overwrites DM_DEV_BUNDLE_ROOT)'
+            class_option :rubies,      :type => :array,   :aliases => '-R', :desc => 'The rvm ruby interpreters to use with this command (overwrites RUBIES)'
+            class_option :include,     :type => :array,   :aliases => '-i', :desc => 'The DM gems to include with this command (overwrites INCLUDE)'
+            class_option :exclude,     :type => :array,   :aliases => '-e', :desc => 'The DM gems to exclude with this command (overwrites EXCLUDE)'
+            class_option :adapters,    :type => :array,   :aliases => '-a', :desc => 'The DM adapters to use with this command (overwrites ADAPTERS)'
+            class_option :verbose,     :type => :boolean, :aliases => '-v', :desc => 'Print the shell commands being executed'
+          end
+        end
+      end
+
       namespace :dm
 
-      class_option :verbose, :default => false, :aliases => '-v'
+      include CommonOptions
 
       desc 'sync', 'Sync with the DM repositories'
       def sync
@@ -706,7 +727,7 @@ module DataMapper
 
         namespace 'dm:bundle'
 
-        class_option :verbose, :default => false, :aliases => '-v'
+        include CommonOptions
 
         desc 'install', 'Bundle the DM repositories'
         def install

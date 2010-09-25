@@ -121,56 +121,86 @@ code, we need to make sure that this code is available.
 
 ## Common options
 
-Every task can be configured with a few environment variables. The rubies to use can be altered by passing something like `RUBIES=1.8.7,1.9.2,rbx`. When given, `INCLUDE=dm-core,dm-validations` will make sure that only these two gems are used. When `INCLUDE` is left out, *all* (not ignored) gems will be used. Passing `EXCLUDE=dm-tags,dm-is-tree` will use all but those two gems.
+Every task can be configured with a few environment variables.
 
+    DM_DEV_ROOT=/some/path           # Points to where the DM sources will be installed and used
+    DM_DEV_BUNDLE_ROOT=/some/path    # Points to where bundler will install all it's data
+    RUBIES="1.8.7 1.9.2"             # The rvm ruby interpreters to use
+    INCLUDE="dm-core dm-validations" # Makes sure that only these gems are used. When left out, all gems will be used
+    EXCLUDE="dm-tags dm-ar-finders"  # Makes sure that these gems are not used
+    ADAPTERS="mysql postgres"        # Use only these DM adapters
+    VERBOSE=true                     # Print out every shell command before executing it
+
+Any of these environment variables has an equivalent thor option as will be
+seen below. When a thor option is passed for which the respective
+environment variable has already been set too, the thor option will
+overwrite the environment variable's value.
 
 ## The available thor tasks
 
-    thor dm:sync           # --verbose # -v
-    thor dm:bundle:install # --verbose # -v
-    thor dm:bundle:update  # --verbose # -v
-    thor dm:spec           # --verbose # -v
-    thor dm:implode        # --verbose # -v
+    thor dm:sync
+    thor dm:bundle:install
+    thor dm:bundle:update
+    thor dm:spec
+    thor dm:implode
 
 ## Example thor session
 
-    ree-1.8.7-2010.02@datamapper mungo:dm-dev snusnu$ thor -T
-    dm
-    --
-    thor dm:bundle:install  # Bundle the DM repositories
-    thor dm:bundle:update   # Update the bundled DM repositories
-    thor dm:implode         # Delete all DM gems
-    thor dm:release         # Release all DM gems to rubygems
-    thor dm:spec            # Run specs for DM gems
-    thor dm:sync            # Sync with the DM repositories
+    Tasks:
+      /path/to/your/thor dm:bundle:install  # Bundle the DM repositories
+      /path/to/your/thor dm:bundle:update   # Update the bundled DM repositories
+      /path/to/your/thor dm:help [TASK]     # Describe available tasks or one specific task
+      /path/to/your/thor dm:implode         # Delete all DM gems
+      /path/to/your/thor dm:release         # Release all DM gems to rubygems
+      /path/to/your/thor dm:spec            # Run specs for DM gems
+      /path/to/your/thor dm:sync            # Sync with the DM repositories
 
-    ree-1.8.7-2010.02@datamapper mungo:dm-dev snusnu$ INCLUDE=dm-validations thor dm:sync
+    Options:
+      -v, [--verbose]                  # Print the shell commands being executed
+      -a, [--adapters=one two three]   # The DM adapters to use with this command (overwrites ADAPTERS)
+      -i, [--include=one two three]    # The DM gems to include with this command (overwrites INCLUDE)
+      -r, [--root=ROOT]                # The directory where all DM source code is stored (overwrites DM_DEV_ROOT)
+      -R, [--rubies=one two three]     # The rvm ruby interpreters to use with this command (overwrites RUBIES)
+      -B, [--bundle-root=BUNDLE_ROOT]  # The directory where bundler stores all its data (overwrites DM_DEV_BUNDLE_ROOT)
+      -e, [--exclude=one two three]    # The DM gems to exclude with this command (overwrites EXCLUDE)
+
+    ree-1.8.7-2010.02 mungo:dm-dev snusnu$ thor dm:sync -i dm-validations dm-constraints
     <GitHub::User name="DataMapper">
-    [1/1] Cloning dm-validations
-
-    ree-1.8.7-2010.02@datamapper mungo:dm-dev snusnu$ INCLUDE=dm-validations thor dm:sync
+    [1/2] Cloning dm-constraints
+    [2/2] Cloning dm-validations
+    ree-1.8.7-2010.02 mungo:dm-dev snusnu$ thor dm:sync -i dm-validations dm-constraints
     <GitHub::User name="DataMapper">
-    [1/1] Pulling dm-validations
-
-    ree-1.8.7-2010.02@datamapper mungo:dm-dev snusnu$ INCLUDE=dm-validations thor dm:implode
+    [1/2] Pulling dm-constraints
+    [2/2] Pulling dm-validations
+    ree-1.8.7-2010.02 mungo:dm-dev snusnu$ thor dm:implode -i dm-validations dm-constraints
     <GitHub::User name="DataMapper">
-    [1/1] Deleting dm-validations
-
-    ree-1.8.7-2010.02@datamapper mungo:dm-dev snusnu$ INCLUDE=dm-validations thor dm:sync
+    [1/2] Deleting dm-constraints
+    [2/2] Deleting dm-validations
+    ree-1.8.7-2010.02 mungo:dm-dev snusnu$ thor dm:sync -i dm-validations dm-constraints
     <GitHub::User name="DataMapper">
-    [1/1] Cloning dm-validations
-
-    ree-1.8.7-2010.02@datamapper mungo:dm-dev snusnu$ INCLUDE=dm-validations thor dm:bundle:install
+    [1/2] Cloning dm-constraints
+    [2/2] Cloning dm-validations
+    ree-1.8.7-2010.02 mungo:dm-dev snusnu$ thor dm:bundle:install -R 1.8.7 1.9.2 jruby rbx -i dm-validations dm-constraints
     <GitHub::User name="DataMapper">
-    [1/1] [1.8.7] bundle install dm-validations
-    [1/1] [1.9.2] bundle install dm-validations
-
-    ree-1.8.7-2010.02@datamapper mungo:dm-dev snusnu$ INCLUDE=dm-validations thor dm:bundle:update
+    [1/2] [1.8.7] bundle install dm-constraints
+    [1/2] [1.9.2] bundle install dm-constraints
+    [1/2] [jruby] bundle install dm-constraints
+    [1/2] [rbx] bundle install dm-constraints
+    [2/2] [1.8.7] bundle install dm-validations
+    [2/2] [1.9.2] bundle install dm-validations
+    [2/2] [jruby] bundle install dm-validations
+    [2/2] [rbx] bundle install dm-validations
+    ree-1.8.7-2010.02 mungo:dm-dev snusnu$ thor dm:bundle:update -R 1.8.7 1.9.2 jruby rbx -i dm-validations dm-constraints
     <GitHub::User name="DataMapper">
-    [1/1] [1.8.7] bundle update dm-validations
-    [1/1] [1.9.2] bundle update dm-validations
-
-    ree-1.8.7-2010.02@datamapper mungo:dm-dev snusnu$ RUBIES=1.8.7,1.9.2,jruby,rbx-1.1.0 INCLUDE=dm-constraints,dm-validations thor dm:spec
+    [1/2] [1.8.7] bundle update dm-constraints
+    [1/2] [1.9.2] bundle update dm-constraints
+    [1/2] [jruby] bundle update dm-constraints
+    [1/2] [rbx] bundle update dm-constraints
+    [2/2] [1.8.7] bundle update dm-validations
+    [2/2] [1.9.2] bundle update dm-validations
+    [2/2] [jruby] bundle update dm-validations
+    [2/2] [rbx] bundle update dm-validations
+    ree-1.8.7-2010.02 mungo:dm-dev snusnu$ thor dm:spec -R 1.8.7 1.9.2 jruby rbx -i dm-validations dm-constraints
     <GitHub::User name="DataMapper">
 
     h2. dm-constraints
@@ -179,7 +209,7 @@ Every task can be configured with a few environment variables. The rubies to use
     | 1.8.7 | pass | pass | pass | pass | pass |
     | 1.9.2 | pass | pass | pass | pass | pass |
     | jruby | pass | pass | pass | pass | pass |
-    | rbx-1.1.0 | pass | pass | pass | pass | pass |
+    | rbx | pass | pass | pass | pass | pass |
 
     h2. dm-validations
 
@@ -187,177 +217,92 @@ Every task can be configured with a few environment variables. The rubies to use
     | 1.8.7 | pass | pass | pass | pass | pass |
     | 1.9.2 | pass | pass | pass | pass | pass |
     | jruby | pass | pass | pass | pass | pass |
-    | rbx-1.1.0 | pass | pass | pass | pass | pass |
+    | rbx | pass | pass | pass | pass | pass |
 
 ## The available ruby API
 
-Currently, environment variables are the only way to configure these API
-calls. It's planned to map those environment variables to a regular ruby
-option hash in the future.
+    # All the methods below accept the following options.
+    #
+    #   :root        => "/path/to/store/dm/sources"                # overwrites ENV['DM_DEV_ROOT']
+    #   :bundle_root => "/path/to/store/dm/bundler/data"           # overwrites ENV['DM_DEV_BUNDLE_ROOT']
+    #   :rubies      => %w[ 1.8.7 1.9.2 jruby rbx ]                # overwrites ENV['RUBIES']
+    #   :include     => %w[ dm-core dm-validations ]               # overwrites ENV['INCLUDE']
+    #   :exclude     => %w[ dm-tags ]                              # overwrites ENV['EXCLUDE']
+    #   :adapters    => %w[ in_memory yaml sqlite mysql postgres ] # overwrites ENV['ADAPTERS']
+    #   :verbose     => false                                      # overwrites ENV['VERBOSE']
+    #
 
-    DM.sync           # :verbose => false
-    DM.bundle_install # :verbose => false
-    DM.bundle_update  # :verbose => false
-    DM.spec           # :verbose => false
-    DM.implode        # :verbose => false
+    DM.sync
+    DM.bundle_install
+    DM.bundle_update
+    DM.spec
+    DM.implode
 
 ## Example IRB session
 
 The following IRB session demonstrate a typical workflow. The API used in this session can also be invoked via system wide thor tasks.
 
-    ree-1.8.7-2010.02@datamapper mungo:dm-dev snusnu$ irb -r tasks.rb
-    ree > DM.sync
+    ree-1.8.7-2010.02 mungo:dm-dev snusnu$ irb -r tasks.rb
+    ree-1.8.7-2010.02 > DM.sync :include => %w[ dm-validations dm-constraints ]
     <GitHub::User name="DataMapper">
-    [01/38] Pulling dm-core
-    [02/38] Pulling do
-    [03/38] Pulling extlib
-    [04/38] Pulling datamapper.github.com
-    [05/38] Pulling data_mapper
-    [06/38] Pulling dm-rails
-    [07/38] Pulling dm-active_model
-    [08/38] Pulling dm-transactions
-    [09/38] Pulling dm-mysql-adapter
-    [10/38] Pulling dm-postgres-adapter
-    [11/38] Pulling dm-sqlite-adapter
-    [12/38] Pulling dm-do-adapter
-    [13/38] Pulling dm-yaml-adapter
-    [14/38] Pulling dm-adjust
-    [15/38] Pulling dm-aggregates
-    [16/38] Pulling dm-ar-finders
-    [17/38] Pulling dm-cli
-    [18/38] Pulling dm-constraints
-    [19/38] Pulling dm-is-list
-    [20/38] Pulling dm-is-nested_set
-    [21/38] Pulling dm-is-remixable
-    [22/38] Pulling dm-is-searchable
-    [23/38] Pulling dm-is-state_machine
-    [24/38] Pulling dm-is-tree
-    [25/38] Pulling dm-is-versioned
-    [26/38] Pulling dm-migrations
-    [27/38] Pulling dm-observer
-    [28/38] Pulling dm-serializer
-    [29/38] Pulling dm-sweatshop
-    [30/38] Pulling dm-tags
-    [31/38] Pulling dm-timestamps
-    [32/38] Pulling dm-types
-    [33/38] Pulling dm-validations
-    [34/38] Pulling dm-models
-    [35/38] Pulling dm-ferret-adapter
-    [36/38] Pulling dm-rest-adapter
-    [37/38] Pulling rails_datamapper
-    [38/38] Pulling dm-dev
+    [1/2] Cloning dm-constraints
+    [2/2] Cloning dm-validations
      => nil
-    ree > DM.bundle_install
+    ree-1.8.7-2010.02 > DM.sync :include => %w[ dm-validations dm-constraints ]
     <GitHub::User name="DataMapper">
-    [01/38] [1.8.7] bundle install dm-core
-    [01/38] [1.9.2] bundle install dm-core
-    [02/38] [1.8.7] bundle install do SKIPPED - because it's missing a Gemfile
-    [02/38] [1.9.2] bundle install do SKIPPED - because it's missing a Gemfile
-    [03/38] [1.8.7] bundle install extlib SKIPPED - because it's missing a Gemfile
-    [03/38] [1.9.2] bundle install extlib SKIPPED - because it's missing a Gemfile
-    [04/38] [1.8.7] bundle install datamapper.github.com SKIPPED - because it's ignored
-    [04/38] [1.9.2] bundle install datamapper.github.com SKIPPED - because it's ignored
-    [05/38] [1.8.7] bundle install data_mapper SKIPPED - because it's ignored
-    [05/38] [1.9.2] bundle install data_mapper SKIPPED - because it's ignored
-    [06/38] [1.8.7] bundle install dm-rails
-    [06/38] [1.9.2] bundle install dm-rails
-    [07/38] [1.8.7] bundle install dm-active_model
-    [07/38] [1.9.2] bundle install dm-active_model
-    [08/38] [1.8.7] bundle install dm-transactions
-    [08/38] [1.9.2] bundle install dm-transactions
-    [09/38] [1.8.7] bundle install dm-mysql-adapter
-    [09/38] [1.9.2] bundle install dm-mysql-adapter
-    [10/38] [1.8.7] bundle install dm-postgres-adapter
-    [10/38] [1.9.2] bundle install dm-postgres-adapter
-    [11/38] [1.8.7] bundle install dm-sqlite-adapter
-    [11/38] [1.9.2] bundle install dm-sqlite-adapter
-    [12/38] [1.8.7] bundle install dm-do-adapter
-    [12/38] [1.9.2] bundle install dm-do-adapter
-    [13/38] [1.8.7] bundle install dm-yaml-adapter
-    [13/38] [1.9.2] bundle install dm-yaml-adapter
-    [14/38] [1.8.7] bundle install dm-adjust
-    [14/38] [1.9.2] bundle install dm-adjust
-    [15/38] [1.8.7] bundle install dm-aggregates
-    [15/38] [1.9.2] bundle install dm-aggregates
-    [16/38] [1.8.7] bundle install dm-ar-finders
-    [16/38] [1.9.2] bundle install dm-ar-finders
-    [17/38] [1.8.7] bundle install dm-cli
-    [17/38] [1.9.2] bundle install dm-cli
-    [18/38] [1.8.7] bundle install dm-constraints
-    [18/38] [1.9.2] bundle install dm-constraints
-    [19/38] [1.8.7] bundle install dm-is-list
-    [19/38] [1.9.2] bundle install dm-is-list
-    [20/38] [1.8.7] bundle install dm-is-nested_set
-    [20/38] [1.9.2] bundle install dm-is-nested_set
-    [21/38] [1.8.7] bundle install dm-is-remixable
-    [21/38] [1.9.2] bundle install dm-is-remixable
-    [22/38] [1.8.7] bundle install dm-is-searchable
-    [22/38] [1.9.2] bundle install dm-is-searchable
-    [23/38] [1.8.7] bundle install dm-is-state_machine
-    [23/38] [1.9.2] bundle install dm-is-state_machine
-    [24/38] [1.8.7] bundle install dm-is-tree
-    [24/38] [1.9.2] bundle install dm-is-tree
-    [25/38] [1.8.7] bundle install dm-is-versioned
-    [25/38] [1.9.2] bundle install dm-is-versioned
-    [26/38] [1.8.7] bundle install dm-migrations
-    [26/38] [1.9.2] bundle install dm-migrations
-    [27/38] [1.8.7] bundle install dm-observer
-    [27/38] [1.9.2] bundle install dm-observer
-    [28/38] [1.8.7] bundle install dm-serializer
-    [28/38] [1.9.2] bundle install dm-serializer
-    [29/38] [1.8.7] bundle install dm-sweatshop
-    [29/38] [1.9.2] bundle install dm-sweatshop
-    [30/38] [1.8.7] bundle install dm-tags
-    [30/38] [1.9.2] bundle install dm-tags
-    [31/38] [1.8.7] bundle install dm-timestamps
-    [31/38] [1.9.2] bundle install dm-timestamps
-    [32/38] [1.8.7] bundle install dm-types
-    [32/38] [1.9.2] bundle install dm-types
-    [33/38] [1.8.7] bundle install dm-validations
-    [33/38] [1.9.2] bundle install dm-validations
-    [34/38] [1.8.7] bundle install dm-models SKIPPED - because it's missing a Gemfile
-    [34/38] [1.9.2] bundle install dm-models SKIPPED - because it's missing a Gemfile
-    [35/38] [1.8.7] bundle install dm-ferret-adapter SKIPPED - because it's ignored
-    [35/38] [1.9.2] bundle install dm-ferret-adapter SKIPPED - because it's ignored
-    [36/38] [1.8.7] bundle install dm-rest-adapter
-    [36/38] [1.9.2] bundle install dm-rest-adapter
-    [37/38] [1.8.7] bundle install rails_datamapper SKIPPED - because it's ignored
-    [37/38] [1.9.2] bundle install rails_datamapper SKIPPED - because it's ignored
-    [38/38] [1.8.7] bundle install dm-dev SKIPPED - because it's ignored
-    [38/38] [1.9.2] bundle install dm-dev SKIPPED - because it's ignored
+    [1/2] Pulling dm-constraints
+    [2/2] Pulling dm-validations
      => nil
-    ree > exit
-    ree-1.8.7-2010.02@datamapper mungo:dm-dev snusnu$ RUBIES=1.8.7,1.9.2 INCLUDE=dm-validations ADAPTERS=sqlite,postgres,mysql irb -r tasks.rb
-    ree > DM.sync
+    ree-1.8.7-2010.02 > DM.implode :include => %w[ dm-validations dm-constraints ]
     <GitHub::User name="DataMapper">
-    [1/1] Pulling dm-validations
+    [1/2] Deleting dm-constraints
+    [2/2] Deleting dm-validations
      => nil
-    ree > DM.implode
+    ree-1.8.7-2010.02 > DM.sync :include => %w[ dm-validations dm-constraints ]
     <GitHub::User name="DataMapper">
-    [1/1] Deleting dm-validations
+    [1/2] Cloning dm-constraints
+    [2/2] Cloning dm-validations
      => nil
-    ree > DM.sync
+    ree-1.8.7-2010.02 > DM.bundle_install :rubies => %w[ 1.8.7 1.9.2 jruby rbx], :include => %w[ dm-validations dm-constraints ]
     <GitHub::User name="DataMapper">
-    [1/1] Cloning dm-validations
+    [1/2] [1.8.7] bundle install dm-constraints
+    [1/2] [1.9.2] bundle install dm-constraints
+    [1/2] [jruby] bundle install dm-constraints
+    [1/2] [rbx] bundle install dm-constraints
+    [2/2] [1.8.7] bundle install dm-validations
+    [2/2] [1.9.2] bundle install dm-validations
+    [2/2] [jruby] bundle install dm-validations
+    [2/2] [rbx] bundle install dm-validations
      => nil
-    ree > DM.bundle_install
+    ree-1.8.7-2010.02 > DM.bundle_update :rubies => %w[ 1.8.7 1.9.2 jruby rbx], :include => %w[ dm-validations dm-constraints ]
     <GitHub::User name="DataMapper">
-    [1/1] [1.8.7] bundle install dm-validations
-    [1/1] [1.9.2] bundle install dm-validations
+    [1/2] [1.8.7] bundle update dm-constraints
+    [1/2] [1.9.2] bundle update dm-constraints
+    [1/2] [jruby] bundle update dm-constraints
+    [1/2] [rbx] bundle update dm-constraints
+    [2/2] [1.8.7] bundle update dm-validations
+    [2/2] [1.9.2] bundle update dm-validations
+    [2/2] [jruby] bundle update dm-validations
+    [2/2] [rbx] bundle update dm-validations
      => nil
-    ree > DM.bundle_update
+    ree-1.8.7-2010.02 > DM.spec :rubies => %w[ 1.8.7 1.9.2 jruby rbx], :include => %w[ dm-validations dm-constraints ]
     <GitHub::User name="DataMapper">
-    [1/1] [1.8.7] bundle update dm-validations
-    [1/1] [1.9.2] bundle update dm-validations
-     => nil
-    ree > DM.spec
-    <GitHub::User name="DataMapper">
+
+    h2. dm-constraints
+
+    | RUBY  | in_memory | yaml | sqlite | postgres | mysql |
+    | 1.8.7 | pass | pass | pass | pass | pass |
+    | 1.9.2 | pass | pass | pass | pass | pass |
+    | jruby | pass | pass | pass | pass | pass |
+    | rbx | pass | pass | pass | pass | pass |
 
     h2. dm-validations
 
-    | RUBY  | sqlite | postgres | mysql |
-    | 1.8.7 | pass | pass | pass |
-    | 1.9.2 | pass | pass | pass |
+    | RUBY  | in_memory | yaml | sqlite | postgres | mysql |
+    | 1.8.7 | pass | pass | pass | pass | pass |
+    | 1.9.2 | pass | pass | pass | pass | pass |
+    | jruby | pass | pass | pass | pass | pass |
+    | rbx | pass | pass | pass | pass | pass |
      => nil
-    ree >
+
 
