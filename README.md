@@ -89,13 +89,13 @@ The following describes the new DM development tasks and shows how you can use t
 
 ## Totally isolated
 
-The following tasks don't affect the system gems *at all*. Nor do they mess with any rvm ruby specific (system)gem(set). By default, *everything* will be bundled below `"#{Dir.pwd}/DM_BUNDLE_ROOT"`, you can alter the install location by passing the `BUNDLE_ROOT=/path/to/bundle/root` ENV var. `BUNDLE_ROOT` contains separate folders for every ruby in use.
+The following tasks don't affect the system gems *at all*. Nor do they mess with any rvm ruby specific (system)gem(set). By default, *everything* will be bundled below `"#{Dir.pwd}/DM_DEV_BUNDLE_ROOT"`, you can alter the install location by passing the `DM_DEV_BUNDLE_ROOT=/path/to/bundle/root` ENV var. `DM_DEV_BUNDLE_ROOT` contains separate folders for every ruby in use.
 
 This means that once all dependencies are bundled for any given ruby, there's no need to clean anything between spec runs. Also, no re-bundling needs to happen before spec runs since everything is already bundled. Of course, the bundles can be updated manually, to ensure that the code under test is up to date. In the near future, a command that tells you exactly which repos need updating, will be included.
 
 The tasks make sure that you're always testing against local sources. This is very important if you're developing patches that touch multiple DM repositories. Testing against local sources only, will make sure that the code still works with all your modifications to potentially more than one DM repository.
 
-To achieve this, the bundle tasks first create a `Gemfile.local` for every repository that includes a Gemfile (or isn't otherwise ignored), and then copies that file to `Gemfile.ruby_version.local` where *ruby_version* is any of the specified rubies to use. This is done because bundler automatically creates a `Gemfile.lock` after `bundle install`. In our case that leaves us with files like `Gemfile.1.9.2.local` and `Gemfile.1.9.2.local.lock`. That's necessary, because otherwise bundler confuses the the `BUNDLE_PATH` to use. Every command executed by the bundle tasks explicitly passes `BUNDLE_PATH=/path/to/BUNDLE_ROOT/ruby_version` and `BUNDLE_GEMFILE=/path/to/Gemfile.ruby_version.local` as environment variables, to make sure that the right (local) bundle is used.
+To achieve this, the bundle tasks first create a `Gemfile.local` for every repository that includes a Gemfile (or isn't otherwise ignored), and then copies that file to `Gemfile.ruby_version.local` where *ruby_version* is any of the specified rubies to use. This is done because bundler automatically creates a `Gemfile.lock` after `bundle install`. In our case that leaves us with files like `Gemfile.1.9.2.local` and `Gemfile.1.9.2.local.lock`. That's necessary, because otherwise bundler confuses the the `BUNDLE_PATH` to use. Every command executed by the bundle tasks explicitly passes `BUNDLE_PATH=/path/to/DM_DEV_BUNDLE_ROOT/ruby_version` and `BUNDLE_GEMFILE=/path/to/Gemfile.ruby_version.local` as environment variables, to make sure that the right (local) bundle is used.
 
 ## Remove all traces easily
 
@@ -104,10 +104,10 @@ folder, it's easy to get rid of it any time. Apart from obviously just
 deleting the folder, you can use `thor dm:implode` just for the fun of
 it.
 
-When the `INCLUDE` environment variable *is not specified*, all repositories will be deleted as well as the `BUNDLE_ROOT`, meaning that you will have to re-bundle everything next time.
+When the `INCLUDE` environment variable *is not specified*, all repositories will be deleted as well as the `DM_DEV_BUNDLE_ROOT`, meaning that you will have to re-bundle everything next time.
 
 When the `INCLUDE` environment variable *is specified*, only the
-specified repositories will be deleted. The `BUNDLE_ROOT` stays
+specified repositories will be deleted. The `DM_DEV_BUNDLE_ROOT` stays
 untouched.
 
 ## Running specs

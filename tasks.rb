@@ -170,15 +170,15 @@ class ::Project
 
     def initialize(name)
       @name        = name
-      @root        = Pathname(ENV['ROOT'       ] || Dir.pwd)
-      @bundle_root = Pathname(ENV['BUNDLE_ROOT'] || @root.join(default_bundle_root))
+      @root        = Pathname(ENV['DM_DEV_ROOT']        || Dir.pwd)
+      @bundle_root = Pathname(ENV['DM_DEV_BUNDLE_ROOT'] || @root.join(default_bundle_root))
       @included    = ENV['INCLUDE'] ? normalize(ENV['INCLUDE']) : default_included
       @excluded    = ENV['EXCLUDE'] ? normalize(ENV['EXCLUDE']) : default_excluded
       @rubies      = ENV['RUBIES' ] ? normalize(ENV['RUBIES' ]) : default_rubies
     end
 
     def default_bundle_root
-      'DM_BUNDLE_ROOT'
+      'DM_DEV_BUNDLE_ROOT'
     end
 
     def default_included
