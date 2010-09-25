@@ -35,7 +35,7 @@ class ::Project
 
       def #{command_name(name)}
         self.class.invoke :before, '#{command_name(name)}', env, repos
-        @repos.each_with_index do |repo, index|
+        @repos.each do |repo|
           @logger.progress!
           command_class('#{name}').new(repo, env, @logger, options[:verbose]).run
         end
