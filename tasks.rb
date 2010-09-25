@@ -667,10 +667,6 @@ module DataMapper
         "#{super} #{support_lib(ruby)} ADAPTER='#{@adapter}' TZ='utc'"
       end
 
-      def local_install?
-        working_dir.join('Gemfile.local').file?
-      end
-
     end
 
     # The tasks
