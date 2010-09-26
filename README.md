@@ -51,15 +51,20 @@ to work.
 Installing the DataMapper thor tasks
 ------------------------------------
 
-Currently, you need to clone the github repo containing the tasks and
+The easiest way to install the thor tasks is to simply run the following.
+
+    thor install http://github.com/datamapper/dm-dev/raw/master/tasks.rb
+
+If you don't feel comfortable with executing code loaded from the
+internet, you can also clone the github repo containing the tasks and
 then install them like you would install any thor task.
 
     git clone git://github.com/datamapper/dm-dev.git
     cd dm-dev
     thor install tasks.rb
 
-After showing you the content of tasks.rb, thor will ask you for a
-namespace for those new tasks.
+Either way, after showing you the content of tasks.rb, thor will ask you for a
+name for those new tasks.
 
     Please specify a name for tasks.rb in the system repository [tasks.rb]:
 
