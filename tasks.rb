@@ -755,6 +755,7 @@ module DataMapper
 
       namespace :dm
 
+      include Thor::Actions
       include CommonOptions
 
       desc 'sync', 'Sync with the DM repositories'
@@ -774,7 +775,9 @@ module DataMapper
 
       desc 'implode', 'Delete all DM gems'
       def implode
-        DataMapper::Project.implode(options)
+        if implode_confirmed?
+          DataMapper::Project.implode(options)
+        end
       end
 
       class Bundle < ::Thor
@@ -793,6 +796,27 @@ module DataMapper
           DataMapper::Project.bundle_update(options)
         end
 
+      end
+
+    private
+
+      def implode_confirmed?
+        return true if options[:pretend]
+        question = "Are you really sure? This will destroy #{affected_repositories}! (yes)"
+        ask(question) == 'yes'
+      end
+
+      def affected_repositories
+        included = options[:include]
+        if include_all?(included)
+          'not only all repositories, but also everything below DM_DEV_BUNDLE_ROOT!'
+        else
+          "the following repositories: #{included.join(', ')}!"
+        end
+      end
+
+      def include_all?(included)
+        included.nil? || (included.respond_to?(:each) && included.count == 1 && included.first == 'all')
       end
 
     end
