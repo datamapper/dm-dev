@@ -228,7 +228,7 @@ class ::Project
 
     def log(repo, action, command = nil, msg = nil)
       command = command.to_s.squeeze(' ').strip # TODO also do for actually executed commands
-      if @pretend
+      if @pretend || @verbose
         puts command
       else
         puts '[%0*d/%d] %s %s %s%s' % format(repo, action, command, msg)
@@ -327,6 +327,7 @@ class ::Project
       end
 
       def run
+        log "cd #{working_dir}" if verbose? || pretend?
         FileUtils.cd(working_dir) do
           before
           log(command)
@@ -378,6 +379,7 @@ class ::Project
       end
 
       def run
+        log nil, "cd #{working_dir}" if verbose? || pretend?
         FileUtils.cd(working_dir) do
           rubies.each do |ruby|
             before
@@ -393,6 +395,10 @@ class ::Project
 
       def action(ruby = nil)
         "[#{ruby}]"
+      end
+
+      def log(ruby = nil, command = nil, msg = nil)
+        logger.log(repo, action(ruby), command, msg)
       end
 
     end
@@ -435,10 +441,12 @@ class ::Project
             yield ruby
           else
             if executable?
-              sleep timeout
               log ruby, command(ruby)
-              make_gemfile(ruby)
-              system command(ruby) unless pretend?
+              unless pretend?
+                sleep timeout
+                make_gemfile(ruby)
+                system command(ruby)
+              end
             else
               log ruby, command(ruby), "SKIPPED - #{explanation}"
             end
@@ -489,10 +497,6 @@ class ::Project
         else
           "reason unknown"
         end
-      end
-
-      def log(ruby = nil, command = nil, msg = nil)
-        logger.log(repo, action(ruby), command, msg)
       end
 
     end
@@ -649,7 +653,7 @@ module DataMapper
         "#{super}#{local_install?(ruby) ? '.local' : ''}"
       end
 
-      def local_install?(ruby)
+      def local_install?(ruby = nil)
         working_dir.join("Gemfile.local").file?
       end
 
@@ -675,7 +679,9 @@ module DataMapper
         include DataMapper::Project::Bundle::Manipulation
 
         def before
-          system "rake local_gemfile #{verbosity}"
+          unless local_install?
+            system "rake local_gemfile #{verbosity}"
+          end
         end
 
         def options

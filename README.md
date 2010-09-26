@@ -155,6 +155,14 @@ This is interesting if you want to get familiar with how dm-dev does
 it's thing, or if you want to run the commands directly, without the
 thor tasks involved.
 
+All the tasks also accept the `-v` or `--verbose` switch. When passed,
+output from any commands won't be suppressed, thus allowing you to see
+what the various commands actually return.
+
+Note that passing `-v` or `--verbose` in addition to `-p` or `--pretend`
+will remove the ouput silencing from the commands. This means that when
+executing them, you can watch command output as it arrives.
+
 ## Example thor session
 
     ree-1.8.7-2010.02 mungo:dm-dev snusnu$ thor help dm
