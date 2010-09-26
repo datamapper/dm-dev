@@ -613,7 +613,7 @@ module DataMapper
     end
 
     before 'implode' do |env, repos|
-      FileUtils.rm_rf env.bundle_root if env.included.nil?
+      FileUtils.rm_rf env.bundle_root if env.included.nil? && !env.pretend?
     end
 
     class Environment < ::Project::Environment
