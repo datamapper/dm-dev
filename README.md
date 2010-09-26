@@ -157,6 +157,7 @@ thor tasks involved.
 
 ## Example thor session
 
+    ree-1.8.7-2010.02 mungo:dm-dev snusnu$ thor help dm
     Tasks:
       /path/to/your/thor dm:bundle:install  # Bundle the DM repositories
       /path/to/your/thor dm:bundle:update   # Update the bundled DM repositories
