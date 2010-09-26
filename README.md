@@ -289,7 +289,7 @@ Obviously your results may differ.
 
 When inside any DM repo directory, leaving out a directory to include means
 the task will only operate on the repo residing in the current working
-directory.
+directory. If you want to overwrite that behavior, specify `-i all` explicitly.
 
 This means that when you're working on a gem, you can simply `cd` into
 that directory, and then run any of the tasks without explicitly
@@ -300,14 +300,13 @@ Example:
     export DM_DEV_ROOT=/path/to/dm/dev/root
     cd $DM_DEV_ROOT/dm-validations
 
-    thor dm:sync
-    thor dm:bundle:install
-    thor dm:spec
-    thor dm:implode
+    thor dm:sync           # same as passing: -i dm-validations
+    thor dm:bundle:install # same as passing: -i dm-validations
+    thor dm:spec           # same as passing: -i dm-validations
+    thor dm:implode        # same as passing: -i dm-validations
 
-All the above commands will only use dm-validations. Of course you can
-still pass any other options to the commands. If you want to overwrite
-that behavior, specify `-i all` explicitly.
+All the above commands will *only* use dm-validations. Of course you can
+still pass any other additional options to the commands.
 
 ## The available ruby API
 
