@@ -245,6 +245,30 @@ executing them, you can watch command output as it arrives.
     | jruby | pass | pass | pass | pass | pass |
     | rbx | pass | pass | pass | pass | pass |
 
+## Using the thor tasks inside the source directories
+
+When inside any DM repo directory, leaving out a directory to include means
+the task will only operate on the repo residing in the current working
+directory.
+
+This means that when you're working on a gem, you can simply `cd` into
+that directory, and then run any of the tasks without explicitly
+providing the `-i` option to scope the task to only some gem(s).
+
+Example:
+
+    export DM_DEV_ROOT=/path/to/dm/dev/root
+    cd $DM_DEV_ROOT/dm-validations
+
+    thor dm:sync
+    thor dm:bundle:install
+    thor dm:spec
+    thor dm:implode
+
+All the above commands will only use dm-validations. Of course you can
+still pass any other options to the commands. If you want to overwrite
+that behavior, specify `-i all` explicitly.
+
 ## The available ruby API
 
     # All the methods below accept the following options.
