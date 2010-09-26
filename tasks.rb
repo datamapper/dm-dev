@@ -712,9 +712,9 @@ module DataMapper
         include DataMapper::Project::Bundle::Manipulation
 
         def before
-          log nil, local_gemfile_command
-          unless local_install? || pretend?
-            system local_gemfile_command
+          unless local_install?
+            log nil, local_gemfile_command
+            system local_gemfile_command unless pretend?
           end
         end
 

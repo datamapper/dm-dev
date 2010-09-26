@@ -179,13 +179,9 @@ Obviously your results may differ.
     ree-1.8.7-2010.02 mungo:dm-dev snusnu$ thor dm:bundle:install -i dm-validations -p -v
     <GitHub::User name="DataMapper">
     cd /Users/snusnu/projects/github/shared/datamapper/dm-dev/dm-validations
-    rake local_gemfile
     rvm 1.8.7 exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/1.8.7' BUNDLE_GEMFILE='Gemfile.1.8.7.local' ADAPTERS='in_memory yaml sqlite postgres mysql' bundle install --without quality "
-    rake local_gemfile
     rvm 1.9.2 exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/1.9.2' BUNDLE_GEMFILE='Gemfile.1.9.2.local' ADAPTERS='in_memory yaml sqlite postgres mysql' bundle install --without quality "
-    rake local_gemfile
     rvm jruby exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/jruby' BUNDLE_GEMFILE='Gemfile.jruby.local' ADAPTERS='in_memory yaml sqlite postgres mysql' bundle install --without quality "
-    rake local_gemfile
     rvm rbx exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/rbx' BUNDLE_GEMFILE='Gemfile.rbx.local' ADAPTERS='in_memory yaml sqlite postgres mysql' bundle install --without quality "
 
     ree-1.8.7-2010.02 mungo:dm-dev snusnu$ thor dm:spec -i dm-validations -p -v
