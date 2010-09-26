@@ -194,7 +194,7 @@ class ::Project
     end
 
     def default_rubies
-      %w[ 1.8.7 1.9.2 ]
+      %w[ 1.8.7 1.9.2 jruby rbx ]
     end
 
     def verbose?
