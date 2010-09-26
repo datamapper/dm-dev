@@ -114,7 +114,7 @@ untouched.
 
 The spec task uses the bundled DM sources to run the specs for all specified gems against all specified rubies and adapters. While running, it prints out a matrix, that shows for every ruby and every adapter if the specs `pass` or `fail`.
 
-Note that for the specs to reliably work, you should sync and install
+Note that for the specs to reliably work, you should sync
 *all* DM repositories once. This is necessary because some gems might
 depend on other DM gems and since we're running all specs with local
 code, we need to make sure that this code is available.
