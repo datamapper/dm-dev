@@ -144,6 +144,17 @@ overwrite the environment variable's value.
     thor dm:spec
     thor dm:implode
 
+## Know what's going on
+
+Every task supports the `-p` or `--pretend` switch. When passed,
+no command will actually get executed. Instead, the commands to
+execute are printed to the console. Executing these commands in your
+shell manually, has the same effect as running the thor task itself.
+
+This is interesting if you want to get familiar with how dm-dev does
+it's thing, or if you want to run the commands directly, without the
+thor tasks involved.
+
 ## Example thor session
 
     Tasks:
@@ -157,12 +168,13 @@ overwrite the environment variable's value.
 
     Options:
       -v, [--verbose]                  # Print the shell commands being executed
-      -a, [--adapters=one two three]   # The DM adapters to use with this command (overwrites ADAPTERS)
       -i, [--include=one two three]    # The DM gems to include with this command (overwrites INCLUDE)
       -r, [--root=ROOT]                # The directory where all DM source code is stored (overwrites DM_DEV_ROOT)
       -R, [--rubies=one two three]     # The rvm ruby interpreters to use with this command (overwrites RUBIES)
+      -p, [--pretend]                  # Print the shell commands that would get executed
       -B, [--bundle-root=BUNDLE_ROOT]  # The directory where bundler stores all its data (overwrites DM_DEV_BUNDLE_ROOT)
       -e, [--exclude=one two three]    # The DM gems to exclude with this command (overwrites EXCLUDE)
+      -a, [--adapters=one two three]   # The DM adapters to use with this command (overwrites ADAPTERS)
 
     ree-1.8.7-2010.02 mungo:dm-dev snusnu$ thor dm:sync -i dm-validations dm-constraints
     <GitHub::User name="DataMapper">

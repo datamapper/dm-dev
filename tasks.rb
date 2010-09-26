@@ -56,7 +56,7 @@ class ::Project
     @env      = environment_class.new(name, @options)
     @root     = @env.root
     @repos    = Repositories.new(@root, name, @env.included, @env.excluded + excluded_repos)
-    @logger   = Logger.new(@repos.count, @options[:verbose])
+    @logger   = Logger.new(@env, @repos.count)
     @commands = {}
   end
 
@@ -178,6 +178,7 @@ class ::Project
       @excluded    = @options[:exclude] || (ENV['EXCLUDE'] ? normalize(ENV['EXCLUDE'])  : default_excluded)
       @rubies      = @options[:rubies ] || (ENV['RUBIES' ] ? normalize(ENV['RUBIES' ])  : default_rubies)
       @verbose     = @options[:verbose] || (ENV['VERBOSE'] == 'true')
+      @pretend     = @options[:pretend] || (ENV['PRETEND'] == 'true')
     end
 
     def default_bundle_root
@@ -200,6 +201,10 @@ class ::Project
       @verbose
     end
 
+    def pretend?
+      @pretend
+    end
+
   private
 
     def normalize(string)
@@ -212,15 +217,22 @@ class ::Project
 
     attr_reader :progress
 
-    def initialize(repo_count, verbose)
+    def initialize(env, repo_count)
+      @env      = env
       @progress = 0
       @total    = repo_count
       @padding  = @total.to_s.length
-      @verbose  = verbose
+      @verbose  = @env.verbose?
+      @pretend  = @env.pretend?
     end
 
     def log(repo, action, command = nil, msg = nil)
-      puts '[%0*d/%d] %s %s %s%s' % format(repo, action, command, msg)
+      command = command.to_s.squeeze(' ').strip # TODO also do for actually executed commands
+      if @pretend
+        puts command
+      else
+        puts '[%0*d/%d] %s %s %s%s' % format(repo, action, command, msg)
+      end
     end
 
     def progress!
@@ -276,6 +288,10 @@ class ::Project
       @verbose
     end
 
+    def pretend?
+      @env.pretend?
+    end
+
     def verbosity
       verbose? ? verbose : silent
     end
@@ -313,7 +329,8 @@ class ::Project
       def run
         FileUtils.cd(working_dir) do
           before
-          log(command); system(command)
+          log(command)
+          system(command) unless pretend?
           after
         end
       end
@@ -421,7 +438,7 @@ class ::Project
               sleep timeout
               log ruby, command(ruby)
               make_gemfile(ruby)
-              system command(ruby)
+              system command(ruby) unless pretend?
             else
               log ruby, command(ruby), "SKIPPED - #{explanation}"
             end
@@ -484,23 +501,28 @@ class ::Project
 
       def run
 
-        puts "\nh2. %s\n\n" % repo.name
-        puts '| RUBY  | %s |' % env.adapters.join(' | ')
+        if print_matrix?
+          puts  "\nh2. %s\n\n"   % repo.name
+          puts  '| RUBY  | %s |' % env.adapters.join(' | ')
+        end
 
         super do |ruby|
 
-          print '| %s |' % ruby
+          print '| %s |' % ruby if print_matrix?
 
           if block_given?
+
             yield ruby
+
           else
-            log    command(ruby)
-            system command(ruby)
+            log ruby, command(ruby) unless print_matrix?
 
-            print ' %s |' % [ $?.success? ? 'pass' : 'fail' ]
+            system command(ruby) unless pretend?
+
+            if print_matrix?
+              print ' %s |' % [ $?.success? ? 'pass' : 'fail' ]
+            end
           end
-
-          puts
 
         end
 
@@ -514,6 +536,10 @@ class ::Project
         "#{super} Testing"
       end
 
+      def print_matrix?
+        !verbose? && !pretend?
+      end
+
     end
 
     class Release < Command
@@ -524,7 +550,7 @@ class ::Project
 
         FileUtils.cd(working_dir) do
           log(command)
-          system(command)
+          system(command) unless pretend?
         end
       end
 
@@ -542,11 +568,11 @@ class ::Project
 
       def run
         log    command
-        system command
+        system command unless pretend?
       end
 
       def command
-        "rm -rf #{repo.name} #{verbosity}"
+        "rm -rf #{working_dir} #{verbosity}"
       end
 
       def action
@@ -608,7 +634,7 @@ module DataMapper
     module Bundle
 
       def environment(ruby)
-        "#{super} #{support_lib(ruby)} ADAPTERS='#{adapters(ruby)}'"
+        "#{super} #{support_lib(ruby)}"
       end
 
       def support_lib(ruby)
@@ -616,7 +642,7 @@ module DataMapper
       end
 
       def adapters(ruby)
-        env.adapters.join(',')
+        env.adapters.join(' ')
       end
 
       def gemfile(ruby)
@@ -624,7 +650,7 @@ module DataMapper
       end
 
       def local_install?(ruby)
-        working_dir.join("Gemfile.#{ruby}.local").file?
+        working_dir.join("Gemfile.local").file?
       end
 
       def ignored_repos
@@ -635,9 +661,18 @@ module DataMapper
         2
       end
 
+      module Manipulation
+
+        def environment(ruby)
+          "#{super} ADAPTERS='#{adapters(ruby)}'"
+        end
+
+      end
+
       class Install < ::Project::Command::Bundle::Install
 
         include DataMapper::Project::Bundle
+        include DataMapper::Project::Bundle::Manipulation
 
         def before
           system "rake local_gemfile #{verbosity}"
@@ -652,6 +687,7 @@ module DataMapper
       class Update < ::Project::Command::Bundle::Update
 
         include DataMapper::Project::Bundle
+        include DataMapper::Project::Bundle::Manipulation
 
       end
 
@@ -668,16 +704,22 @@ module DataMapper
 
             @adapter = adapter # HACK?
 
-            log    command(ruby) if verbose?
-            system command(ruby)
+            log ruby, command(ruby) unless print_matrix?
 
-            print ' %s |' % [ $?.success? ? 'pass' : 'fail' ]
+            system command(ruby) unless pretend?
+
+            if print_matrix?
+              print ' %s |' % [ $?.success? ? 'pass' : 'fail' ]
+            end
           end
+
+          puts if print_matrix?
+
         end
       end
 
       def environment(ruby)
-        "#{super} #{support_lib(ruby)} ADAPTER='#{@adapter}' TZ='utc'"
+        "#{super} ADAPTER=#{@adapter} TZ=utc"
       end
 
     end
@@ -694,6 +736,7 @@ module DataMapper
             class_option :include,     :type => :array,   :aliases => '-i', :desc => 'The DM gems to include with this command (overwrites INCLUDE)'
             class_option :exclude,     :type => :array,   :aliases => '-e', :desc => 'The DM gems to exclude with this command (overwrites EXCLUDE)'
             class_option :adapters,    :type => :array,   :aliases => '-a', :desc => 'The DM adapters to use with this command (overwrites ADAPTERS)'
+            class_option :pretend,     :type => :boolean, :aliases => '-p', :desc => 'Print the shell commands that would get executed'
             class_option :verbose,     :type => :boolean, :aliases => '-v', :desc => 'Print the shell commands being executed'
           end
         end
