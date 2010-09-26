@@ -168,6 +168,50 @@ Note that passing `-v` or `--verbose` in addition to `-p` or `--pretend`
 will remove the ouput silencing from the commands. This means that when
 executing them, you can watch command output as it arrives.
 
+Here's an example of what gets printed for the typical commands.
+Obviously your results may differ.
+
+    ree-1.8.7-2010.02 mungo:dm-dev snusnu$ thor dm:sync -i dm-validations -p -v
+    <GitHub::User name="DataMapper">
+    cd /Users/snusnu/projects/github/shared/datamapper/dm-dev/dm-validations
+    git checkout master ; git pull --rebase
+
+    ree-1.8.7-2010.02 mungo:dm-dev snusnu$ thor dm:bundle:install -i dm-validations -p -v
+    <GitHub::User name="DataMapper">
+    cd /Users/snusnu/projects/github/shared/datamapper/dm-dev/dm-validations
+    rake local_gemfile
+    rvm 1.8.7 exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/1.8.7' BUNDLE_GEMFILE='Gemfile.1.8.7.local' ADAPTERS='in_memory yaml sqlite postgres mysql' bundle install --without quality "
+    rake local_gemfile
+    rvm 1.9.2 exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/1.9.2' BUNDLE_GEMFILE='Gemfile.1.9.2.local' ADAPTERS='in_memory yaml sqlite postgres mysql' bundle install --without quality "
+    rake local_gemfile
+    rvm jruby exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/jruby' BUNDLE_GEMFILE='Gemfile.jruby.local' ADAPTERS='in_memory yaml sqlite postgres mysql' bundle install --without quality "
+    rake local_gemfile
+    rvm rbx exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/rbx' BUNDLE_GEMFILE='Gemfile.rbx.local' ADAPTERS='in_memory yaml sqlite postgres mysql' bundle install --without quality "
+
+    ree-1.8.7-2010.02 mungo:dm-dev snusnu$ thor dm:spec -i dm-validations -p -v
+    <GitHub::User name="DataMapper">
+    cd /Users/snusnu/projects/github/shared/datamapper/dm-dev/dm-validations
+    rvm 1.8.7 exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/1.8.7' BUNDLE_GEMFILE='Gemfile.1.8.7.local' ADAPTER=in_memory TZ=utc bundle exec rake spec "
+    rvm 1.8.7 exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/1.8.7' BUNDLE_GEMFILE='Gemfile.1.8.7.local' ADAPTER=yaml TZ=utc bundle exec rake spec "
+    rvm 1.8.7 exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/1.8.7' BUNDLE_GEMFILE='Gemfile.1.8.7.local' ADAPTER=sqlite TZ=utc bundle exec rake spec "
+    rvm 1.8.7 exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/1.8.7' BUNDLE_GEMFILE='Gemfile.1.8.7.local' ADAPTER=postgres TZ=utc bundle exec rake spec "
+    rvm 1.8.7 exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/1.8.7' BUNDLE_GEMFILE='Gemfile.1.8.7.local' ADAPTER=mysql TZ=utc bundle exec rake spec "
+    rvm 1.9.2 exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/1.9.2' BUNDLE_GEMFILE='Gemfile.1.9.2.local' ADAPTER=in_memory TZ=utc bundle exec rake spec "
+    rvm 1.9.2 exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/1.9.2' BUNDLE_GEMFILE='Gemfile.1.9.2.local' ADAPTER=yaml TZ=utc bundle exec rake spec "
+    rvm 1.9.2 exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/1.9.2' BUNDLE_GEMFILE='Gemfile.1.9.2.local' ADAPTER=sqlite TZ=utc bundle exec rake spec "
+    rvm 1.9.2 exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/1.9.2' BUNDLE_GEMFILE='Gemfile.1.9.2.local' ADAPTER=postgres TZ=utc bundle exec rake spec "
+    rvm 1.9.2 exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/1.9.2' BUNDLE_GEMFILE='Gemfile.1.9.2.local' ADAPTER=mysql TZ=utc bundle exec rake spec "
+    rvm jruby exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/jruby' BUNDLE_GEMFILE='Gemfile.jruby.local' ADAPTER=in_memory TZ=utc bundle exec rake spec "
+    rvm jruby exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/jruby' BUNDLE_GEMFILE='Gemfile.jruby.local' ADAPTER=yaml TZ=utc bundle exec rake spec "
+    rvm jruby exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/jruby' BUNDLE_GEMFILE='Gemfile.jruby.local' ADAPTER=sqlite TZ=utc bundle exec rake spec "
+    rvm jruby exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/jruby' BUNDLE_GEMFILE='Gemfile.jruby.local' ADAPTER=postgres TZ=utc bundle exec rake spec "
+    rvm jruby exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/jruby' BUNDLE_GEMFILE='Gemfile.jruby.local' ADAPTER=mysql TZ=utc bundle exec rake spec "
+    rvm rbx exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/rbx' BUNDLE_GEMFILE='Gemfile.rbx.local' ADAPTER=in_memory TZ=utc bundle exec rake spec "
+    rvm rbx exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/rbx' BUNDLE_GEMFILE='Gemfile.rbx.local' ADAPTER=yaml TZ=utc bundle exec rake spec "
+    rvm rbx exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/rbx' BUNDLE_GEMFILE='Gemfile.rbx.local' ADAPTER=sqlite TZ=utc bundle exec rake spec "
+    rvm rbx exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/rbx' BUNDLE_GEMFILE='Gemfile.rbx.local' ADAPTER=postgres TZ=utc bundle exec rake spec "
+    rvm rbx exec bash -c "BUNDLE_PATH='/Users/snusnu/projects/github/shared/datamapper/dm-dev/DM_DEV_BUNDLE_ROOT/rbx' BUNDLE_GEMFILE='Gemfile.rbx.local' ADAPTER=mysql TZ=utc bundle exec rake spec "
+
 ## Example thor session
 
     ree-1.8.7-2010.02 mungo:dm-dev snusnu$ thor help dm
