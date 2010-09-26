@@ -113,8 +113,10 @@ class ::Project
 
     def initialize(root, user, repos, excluded_repos)
       @root, @user    = root, user
+      @repos          = repos
       @excluded_repos = excluded_repos
-      @repositories   = fetch(repos).map do |repo|
+      @metadata       = GitHub::API.user(@user).repositories
+      @repositories   = selected_repositories.map do |repo|
         Repository.new(@root, repo)
       end
     end
@@ -125,18 +127,49 @@ class ::Project
 
   private
 
-    def fetch(repos)
-      GitHub::API.user(@user).repositories.select do |repo|
-        include?(repo, repos)
+    def selected_repositories
+      if use_current_directory?
+        @metadata.select { |repo| managed_repo?(repo) }
+      else
+        @metadata.select { |repo| include_repo?(repo) }
       end
     end
 
-    def include?(repo, repos)
-      if repos
-        repos.include?(repo.name)
+    def managed_repo?(repo)
+      repo.name == relative_path_name
+    end
+
+    def include_repo?(repo)
+      if @repos
+        !excluded_repo?(repo) && (include_all? || @repos.include?(repo.name))
       else
-        !@excluded_repos.include?(repo.name)
+        !excluded_repo?(repo)
       end
+    end
+
+    def excluded_repo?(repo)
+      @excluded_repos.include?(repo.name)
+    end
+
+    def use_current_directory?
+      @repos.nil? && inside_available_repo? && !include_all?
+    end
+
+    def inside_available_repo?
+      @metadata.map(&:name).include?(relative_path_name)
+    end
+
+    def include_all?
+      explicitly_specified = @repos.respond_to?(:each) && @repos.count == 1 && @repos.first == 'all'
+      if inside_available_repo?
+        explicitly_specified
+      else
+        @repos.nil? || explicitly_specified
+      end
+    end
+
+    def relative_path_name
+      Pathname(Dir.pwd).relative_path_from(@root).to_s
     end
 
   end
