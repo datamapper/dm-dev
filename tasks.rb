@@ -679,9 +679,14 @@ module DataMapper
         include DataMapper::Project::Bundle::Manipulation
 
         def before
-          unless local_install?
-            system "rake local_gemfile #{verbosity}"
+          log nil, local_gemfile_command
+          unless local_install? || pretend?
+            system local_gemfile_command
           end
+        end
+
+        def local_gemfile_command
+          "rake local_gemfile #{verbosity}"
         end
 
         def options
