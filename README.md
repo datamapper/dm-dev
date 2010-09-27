@@ -143,11 +143,14 @@ overwrite the environment variable's value.
 
 ## The available thor tasks
 
-    thor dm:sync
-    thor dm:bundle:install
-    thor dm:bundle:update
-    thor dm:spec
-    thor dm:implode
+    thor dm:bundle:install  # Bundle the DM repositories
+    thor dm:bundle:update   # Update the bundled DM repositories
+    thor dm:help [TASK]     # Describe available tasks or one specific task
+    thor dm:implode         # Delete all DM gems
+    thor dm:release         # Release all DM gems to rubygems
+    thor dm:spec            # Run specs for DM gems
+    thor dm:status          # Show git status information
+    thor dm:sync            # Sync with the DM repositories
 
 ## Know what's going on
 
@@ -212,13 +215,14 @@ Obviously your results may differ.
 
     ree-1.8.7-2010.02 mungo:dm-dev snusnu$ thor help dm
     Tasks:
-      /path/to/your/thor dm:bundle:install  # Bundle the DM repositories
-      /path/to/your/thor dm:bundle:update   # Update the bundled DM repositories
-      /path/to/your/thor dm:help [TASK]     # Describe available tasks or one specific task
-      /path/to/your/thor dm:implode         # Delete all DM gems
-      /path/to/your/thor dm:release         # Release all DM gems to rubygems
-      /path/to/your/thor dm:spec            # Run specs for DM gems
-      /path/to/your/thor dm:sync            # Sync with the DM repositories
+      /path/to/thor dm:bundle:install  # Bundle the DM repositories
+      /path/to/thor dm:bundle:update   # Update the bundled DM repositories
+      /path/to/thor dm:help [TASK]     # Describe available tasks or one specific task
+      /path/to/thor dm:implode         # Delete all DM gems
+      /path/to/thor dm:release         # Release all DM gems to rubygems
+      /path/to/thor dm:spec            # Run specs for DM gems
+      /path/to/thor dm:status          # Show git status information
+      /path/to/thor dm:sync            # Sync with the DM repositories
 
     Options:
       -v, [--verbose]                  # Print the shell commands being executed

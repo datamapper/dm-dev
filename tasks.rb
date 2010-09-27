@@ -12,7 +12,7 @@ require 'ruby-github'
 class ::Project
 
   def self.command_names
-    %w[ sync bundle:install bundle:update spec release implode]
+    %w[ sync bundle:install bundle:update spec release implode status ]
   end
 
   def self.command_name(name)
@@ -618,6 +618,26 @@ class ::Project
 
     end
 
+    class Status < Command
+
+      def run
+        log "cd #{working_dir}" if verbose? || pretend?
+        FileUtils.cd(working_dir) do
+          log    command
+          system command unless pretend?
+        end
+      end
+
+      def command
+        "git status"
+      end
+
+      def action
+        'git status'
+      end
+
+    end
+
   end
 
 end
@@ -811,6 +831,11 @@ module DataMapper
         if implode_confirmed?
           DataMapper::Project.implode(options)
         end
+      end
+
+      desc 'status', 'Show git status information'
+      def status
+        DataMapper::Project.status(options)
       end
 
       class Bundle < ::Thor
