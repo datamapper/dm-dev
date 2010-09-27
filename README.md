@@ -83,6 +83,7 @@ your screen.
     thor dm:implode         # Delete all DM gems
     thor dm:release         # Release all DM gems to rubygems
     thor dm:spec            # Run specs for DM gems
+    thor dm:status          # Show git status information
     thor dm:sync            # Sync with the DM repositories
 
 If everything went fine, you should see the above list of available
