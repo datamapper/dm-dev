@@ -79,6 +79,7 @@ your screen.
     dm
     --
     thor dm:bundle:install  # Bundle the DM repositories
+    thor dm:bundle:show     # Show the bundle content
     thor dm:bundle:update   # Update the bundled DM repositories
     thor dm:implode         # Delete all DM gems
     thor dm:release         # Release all DM gems to rubygems
@@ -145,8 +146,8 @@ overwrite the environment variable's value.
 ## The available thor tasks
 
     thor dm:bundle:install  # Bundle the DM repositories
+    thor dm:bundle:show     # Show the bundle content
     thor dm:bundle:update   # Update the bundled DM repositories
-    thor dm:help [TASK]     # Describe available tasks or one specific task
     thor dm:implode         # Delete all DM gems
     thor dm:release         # Release all DM gems to rubygems
     thor dm:spec            # Run specs for DM gems
@@ -217,6 +218,7 @@ Obviously your results may differ.
     ree-1.8.7-2010.02 mungo:dm-dev snusnu$ thor help dm
     Tasks:
       /path/to/thor dm:bundle:install  # Bundle the DM repositories
+      /path/to/thor dm:bundle:show     # Show the bundle content
       /path/to/thor dm:bundle:update   # Update the bundled DM repositories
       /path/to/thor dm:help [TASK]     # Describe available tasks or one specific task
       /path/to/thor dm:implode         # Delete all DM gems

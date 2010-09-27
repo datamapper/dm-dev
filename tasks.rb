@@ -12,7 +12,7 @@ require 'ruby-github'
 class ::Project
 
   def self.command_names
-    %w[ sync bundle:install bundle:update spec release implode status ]
+    %w[ sync bundle:install bundle:update bundle:show spec release implode status ]
   end
 
   def self.command_name(name)
@@ -462,6 +462,19 @@ class ::Project
 
       end
 
+      class Show < Bundle
+
+        def bundle_command
+          'show'
+        end
+
+        def action(ruby = nil)
+          "#{super} bundle show"
+        end
+
+      end
+
+
       def initialize(repo, env, logger)
         super
         @bundle_root = env.bundle_root
@@ -650,6 +663,7 @@ module DataMapper
       super
       commands['bundle:install'] = DataMapper::Project::Bundle::Install
       commands['bundle:update' ] = DataMapper::Project::Bundle::Update
+      commands['bundle:show'   ] = DataMapper::Project::Bundle::Show
       commands['spec']           = DataMapper::Project::Spec
     end
 
@@ -755,6 +769,12 @@ module DataMapper
 
       end
 
+      class Show < ::Project::Command::Bundle::Show
+
+        include DataMapper::Project::Bundle
+        include DataMapper::Project::Bundle::Manipulation
+
+      end
 
     end
 
@@ -853,6 +873,12 @@ module DataMapper
         def update
           DataMapper::Project.bundle_update(options)
         end
+
+        desc 'show', 'Show the bundle content'
+        def show
+          DataMapper::Project.bundle_show(options)
+        end
+
 
       end
 
