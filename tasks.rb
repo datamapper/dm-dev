@@ -301,18 +301,77 @@ class ::Project
       # overwrite in subclasses
     end
 
+    def run
+      log_directory_change
+      FileUtils.cd(working_dir) do
+        if block_given?
+          yield
+        else
+          execute
+        end
+      end
+    end
+
     def after
       # overwrite in subclasses
+    end
+
+    def execute
+      if executable?
+        before
+        unless suppress_log?
+          log(command)
+        end
+        unless pretend?
+          sleep(timeout)
+          system(command)
+        end
+        after
+      else
+        log("SKIPPED! #{explanation} - #{command}")
+      end
+    end
+
+    # overwrite in subclasses
+    def command
+      raise NotImplementedError
+    end
+
+    # overwrite in subclasses
+    def executable?
+      true
+    end
+
+    # overwrite in subclasses
+    def suppress_log?
+      false
+    end
+
+    # overwrite in subclasses
+    def explanation
+      'reason unknown'
+    end
+
+    def log_directory_change
+      if needs_directory_change? && (verbose? || pretend?)
+        log "cd #{working_dir}"
+      end
+    end
+
+    def needs_directory_change?
+      Dir.pwd != working_dir.to_s
     end
 
     def ignored?
       ignored_repos.include?(repo.name)
     end
 
+    # overwrite in subclasses
     def ignored_repos
-      [] # overwrite in subclasses
+      []
     end
 
+    # overwrite in subclasses
     def working_dir
       path
     end
@@ -329,11 +388,17 @@ class ::Project
       verbose? ? verbose : silent
     end
 
+    # overwrite in subclasses
     def verbose
     end
 
     def silent
       '>& /dev/null'
+    end
+
+    # overwrite in subclasses
+    def timeout
+      0
     end
 
     def log(command = nil, msg = nil)
@@ -357,16 +422,6 @@ class ::Project
         super
         @git_uri = uri.dup
         @git_uri.scheme = scheme
-      end
-
-      def run
-        log "cd #{working_dir}" if verbose? || pretend?
-        FileUtils.cd(working_dir) do
-          before
-          log(command)
-          system(command) unless pretend?
-          after
-        end
       end
 
       def scheme
@@ -405,6 +460,7 @@ class ::Project
     class Rvm < Command
 
       attr_reader :rubies
+      attr_reader :ruby
 
       def initialize(repo, env, logger)
         super
@@ -412,26 +468,26 @@ class ::Project
       end
 
       def run
-        log nil, "cd #{working_dir}" if verbose? || pretend?
-        FileUtils.cd(working_dir) do
+        super do
           rubies.each do |ruby|
-            before
-            yield(ruby)
-            after
+            @ruby = ruby
+            if block_given?
+              yield(ruby)
+            else
+              execute
+            end
           end
         end
       end
 
-      def command(ruby)
-        "rvm #{ruby} exec bash -c"
+    private
+
+      def command
+        "rvm #{@ruby} exec bash -c"
       end
 
-      def action(ruby = nil)
-        "[#{ruby}]"
-      end
-
-      def log(ruby = nil, command = nil, msg = nil)
-        logger.log(repo, action(ruby), command, msg)
+      def action
+        "[#{@ruby}]"
       end
 
     end
@@ -444,7 +500,7 @@ class ::Project
           'install'
         end
 
-        def action(ruby = nil)
+        def action
           "#{super} bundle install"
         end
 
@@ -456,7 +512,7 @@ class ::Project
           'update'
         end
 
-        def action(ruby = nil)
+        def action
           "#{super} bundle update"
         end
 
@@ -468,7 +524,7 @@ class ::Project
           'show'
         end
 
-        def action(ruby = nil)
+        def action
           "#{super} bundle show"
         end
 
@@ -481,58 +537,47 @@ class ::Project
         rubies.each { |ruby| bundle_path(ruby).mkpath }
       end
 
-      def run
-        super do |ruby|
-          if block_given?
-            yield ruby
-          else
-            if executable?
-              log ruby, command(ruby)
-              unless pretend?
-                sleep timeout
-                make_gemfile(ruby)
-                system command(ruby)
-              end
-            else
-              log ruby, command(ruby), "SKIPPED - #{explanation}"
-            end
-          end
-        end
+      def before
+        super
+        make_gemfile
       end
 
       def executable?
         !ignored? && repo.installable?
       end
 
-      def command(ruby)
-        "#{super} \"#{environment(ruby)} bundle #{bundle_command} #{options} #{verbosity}\""
+      def command
+        "#{super} \"#{environment} bundle #{bundle_command} #{options} #{verbosity}\""
       end
 
-      def environment(ruby)
-        "BUNDLE_PATH='#{bundle_path(ruby)}' BUNDLE_GEMFILE='#{gemfile(ruby)}'"
+      def environment
+        "BUNDLE_PATH='#{bundle_path(ruby)}' BUNDLE_GEMFILE='#{gemfile}'"
       end
 
       def bundle_path(ruby)
         @bundle_root.join(ruby)
       end
 
-      def gemfile(ruby)
+      def gemfile
         "Gemfile.#{ruby}"
       end
 
-      def make_gemfile(ruby)
-        gemfile = working_dir.join(gemfile(ruby))
-        unless gemfile.file?
-          FileUtils.cp(working_dir.join('Gemfile.local'), gemfile)
+      def make_gemfile
+        unless working_dir.join(gemfile).file?
+          master = working_dir.join(master_gemfile)
+          log "cp #{master} #{gemfile}"
+          unless pretend?
+            FileUtils.cp(master, gemfile)
+          end
         end
+      end
+
+      def master_gemfile
+        'Gemfile'
       end
 
       def options
         nil
-      end
-
-      def timeout
-        0
       end
 
       def explanation
@@ -565,9 +610,8 @@ class ::Project
             yield ruby
 
           else
-            log ruby, command(ruby) unless print_matrix?
 
-            system command(ruby) unless pretend?
+            execute
 
             if print_matrix?
               print ' %s |' % [ $?.success? ? 'pass' : 'fail' ]
@@ -582,12 +626,16 @@ class ::Project
         'exec rake spec'
       end
 
-      def action(ruby = nil)
+      def action
         "#{super} Testing"
       end
 
       def print_matrix?
         !verbose? && !pretend?
+      end
+
+      def suppress_log?
+        print_matrix?
       end
 
     end
@@ -704,23 +752,27 @@ module DataMapper
 
     module Bundle
 
-      def environment(ruby)
-        "#{super} #{support_lib(ruby)}"
+      def environment
+        "#{super} #{support_lib}"
       end
 
-      def support_lib(ruby)
+      def support_lib
         ruby == '1.8.6' ? 'EXTLIB="true"' : ''
       end
 
-      def adapters(ruby)
+      def adapters
         env.adapters.join(' ')
       end
 
-      def gemfile(ruby)
-        "#{super}#{local_install?(ruby) ? '.local' : ''}"
+      def master_gemfile
+        'Gemfile.local'
       end
 
-      def local_install?(ruby = nil)
+      def gemfile
+        "#{super}#{local_install? ? '.local' : ''}"
+      end
+
+      def local_install?
         working_dir.join("Gemfile.local").file?
       end
 
@@ -734,8 +786,8 @@ module DataMapper
 
       module Manipulation
 
-        def environment(ruby)
-          "#{super} ADAPTERS='#{adapters(ruby)}'"
+        def environment
+          "#{super} ADAPTERS='#{adapters}'"
         end
 
       end
@@ -747,9 +799,10 @@ module DataMapper
 
         def before
           unless local_install?
-            log nil, local_gemfile_command
+            log local_gemfile_command
             system local_gemfile_command unless pretend?
           end
+          super
         end
 
         def local_gemfile_command
@@ -785,24 +838,19 @@ module DataMapper
       def run
         super do |ruby|
           env.adapters.each do |adapter|
-
             @adapter = adapter # HACK?
 
-            log ruby, command(ruby) unless print_matrix?
-
-            system command(ruby) unless pretend?
+            execute
 
             if print_matrix?
               print ' %s |' % [ $?.success? ? 'pass' : 'fail' ]
             end
           end
-
           puts if print_matrix?
-
         end
       end
 
-      def environment(ruby)
+      def environment
         "#{super} ADAPTER=#{@adapter} TZ=utc"
       end
 
