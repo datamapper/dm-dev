@@ -328,7 +328,9 @@ class ::Project
         end
         after
       else
-        log("SKIPPED! #{explanation} - #{command}")
+        if verbose? && !pretend?
+          log(command, "SKIPPED! - #{explanation}")
+        end
       end
     end
 
@@ -616,6 +618,7 @@ class ::Project
             if print_matrix?
               print ' %s |' % [ $?.success? ? 'pass' : 'fail' ]
             end
+
           end
 
         end
@@ -631,11 +634,11 @@ class ::Project
       end
 
       def print_matrix?
-        !verbose? && !pretend?
+        executable? && !verbose? && !pretend?
       end
 
       def suppress_log?
-        print_matrix?
+        !executable? || print_matrix?
       end
 
     end
