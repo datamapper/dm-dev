@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 require 'set'
+require 'yaml'
 require 'fileutils'
 require 'pathname'
 
@@ -12,7 +13,7 @@ require 'ruby-github'
 class ::Project
 
   def self.command_names
-    %w[ sync bundle:install bundle:update bundle:show spec release implode status ]
+    %w[ sync bundle:install bundle:update bundle:show spec release implode status list ]
   end
 
   def self.command_name(name)
@@ -83,6 +84,42 @@ class ::Project
     hooks[name].each { |hook| hook.call(*args) }
   end
 
+  class Metadata
+
+    attr_reader :root
+    attr_reader :name
+    attr_reader :repositories
+
+    def self.fetch(root, name)
+      new(root, name).repositories
+    end
+
+    def initialize(root, name)
+      @root, @name  = root, name
+      @repositories = fetch
+    end
+
+    def fetch
+      filename = root.join(config_file_name)
+      if filename.file?
+        load_from_yaml(filename)
+      else
+        GitHub::API.user(name).repositories
+      end
+    end
+
+    def config_file_name
+      'dm-dev.yml'
+    end
+
+    def load_from_yaml(filename)
+      YAML.load(File.open(filename))['repositories'].map do |repo|
+        Struct.new(:name, :url).new(repo['name'], repo['url'])
+      end
+    end
+
+  end
+
   module Utils
 
     def self.full_const_get(name, root = Object)
@@ -115,7 +152,7 @@ class ::Project
       @root, @user    = root, user
       @repos          = repos
       @excluded_repos = excluded_repos
-      @metadata       = GitHub::API.user(@user).repositories
+      @metadata       = Metadata.fetch(@root, @user)
       @repositories   = selected_repositories.map do |repo|
         Repository.new(@root, repo)
       end
@@ -405,6 +442,18 @@ class ::Project
 
     def log(command = nil, msg = nil)
       logger.log(repo, action, command, msg)
+    end
+
+    class List < ::Project::Command
+
+      def run
+        log
+      end
+
+      def action
+        nil
+      end
+
     end
 
     class Sync < Command
@@ -881,6 +930,17 @@ module DataMapper
 
       include Thor::Actions
       include CommonOptions
+
+      class Meta < ::Thor
+
+        namespace 'dm:meta'
+
+        desc 'list', 'List locally known DM repositories'
+        def list
+          DataMapper::Project.list
+        end
+
+      end
 
       desc 'sync', 'Sync with the DM repositories'
       def sync
