@@ -35,12 +35,20 @@ class ::Project
       end
 
       def #{command_name(name)}
+        start = Time.now if options[:benchmark]
         self.class.invoke :before, '#{command_name(name)}', env, repos
         @repos.each do |repo|
           @logger.progress!
           command_class('#{name}').new(repo, env, @logger).run
         end
         self.class.invoke :after, '#{command_name(name)}', env, repos
+        stop = Time.now if options[:benchmark]
+
+        if options[:benchmark]
+          puts '-------------------------------'
+          puts "Time elapsed: \#{stop - start}"
+          puts '-------------------------------'
+        end
       end
     RUBY
   end
@@ -922,6 +930,7 @@ module DataMapper
             class_option :adapters,    :type => :array,   :aliases => '-a', :desc => 'The DM adapters to use with this command (overwrites ADAPTERS)'
             class_option :pretend,     :type => :boolean, :aliases => '-p', :desc => 'Print the shell commands that would get executed'
             class_option :verbose,     :type => :boolean, :aliases => '-v', :desc => 'Print the shell commands being executed'
+            class_option :benchmark,   :type => :boolean, :aliases => '-b', :desc => 'Print the time the command took to execute'
           end
         end
       end
