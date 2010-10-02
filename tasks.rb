@@ -448,6 +448,10 @@ class ::Project
       0
     end
 
+    # overwrite in subclasses
+    def action
+    end
+
     def log(command = nil, msg = nil)
       logger.log(repo, action, command, msg)
     end
@@ -456,10 +460,6 @@ class ::Project
 
       def run
         log
-      end
-
-      def action
-        nil
       end
 
     end
