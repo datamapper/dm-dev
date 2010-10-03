@@ -82,6 +82,7 @@ your screen.
     thor dm:bundle:show     # Show the bundle content
     thor dm:bundle:update   # Update the bundled DM repositories
     thor dm:implode         # Delete all DM gems
+    thor dm:meta:list       # List locally known DM repositories
     thor dm:release         # Release all DM gems to rubygems
     thor dm:spec            # Run specs for DM gems
     thor dm:status          # Show git status information
@@ -149,6 +150,7 @@ overwrite the environment variable's value.
     thor dm:bundle:show     # Show the bundle content
     thor dm:bundle:update   # Update the bundled DM repositories
     thor dm:implode         # Delete all DM gems
+    thor dm:meta:list       # List locally known DM repositories
     thor dm:release         # Release all DM gems to rubygems
     thor dm:spec            # Run specs for DM gems
     thor dm:status          # Show git status information
@@ -220,8 +222,8 @@ Obviously your results may differ.
       /path/to/thor dm:bundle:install  # Bundle the DM repositories
       /path/to/thor dm:bundle:show     # Show the bundle content
       /path/to/thor dm:bundle:update   # Update the bundled DM repositories
-      /path/to/thor dm:help [TASK]     # Describe available tasks or one specific task
       /path/to/thor dm:implode         # Delete all DM gems
+      /path/to/thor dm:meta:list       # List locally known DM repositories
       /path/to/thor dm:release         # Release all DM gems to rubygems
       /path/to/thor dm:spec            # Run specs for DM gems
       /path/to/thor dm:status          # Show git status information
@@ -229,13 +231,15 @@ Obviously your results may differ.
 
     Options:
       -v, [--verbose]                  # Print the shell commands being executed
+      -a, [--adapters=one two three]   # The DM adapters to use with this command (overwrites ADAPTERS)
       -i, [--include=one two three]    # The DM gems to include with this command (overwrites INCLUDE)
       -r, [--root=ROOT]                # The directory where all DM source code is stored (overwrites DM_DEV_ROOT)
+      -b, [--benchmark]                # Print the time the command took to execute
       -R, [--rubies=one two three]     # The rvm ruby interpreters to use with this command (overwrites RUBIES)
       -p, [--pretend]                  # Print the shell commands that would get executed
       -B, [--bundle-root=BUNDLE_ROOT]  # The directory where bundler stores all its data (overwrites DM_DEV_BUNDLE_ROOT)
       -e, [--exclude=one two three]    # The DM gems to exclude with this command (overwrites EXCLUDE)
-      -a, [--adapters=one two three]   # The DM adapters to use with this command (overwrites ADAPTERS)
+
 
     ree-1.8.7-2010.02 mungo:dm-dev snusnu$ thor dm:sync -i dm-validations dm-constraints
     <GitHub::User name="DataMapper">
