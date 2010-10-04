@@ -1020,9 +1020,16 @@ module DataMapper
       end
 
       def include_all?(included)
-        included.nil? || (included.respond_to?(:each) && included.count == 1 && included.first == 'all')
+        include_all_implicitly? || include_all_explicitly?
       end
 
+      def include_all_implicitly?(included)
+        included.nil?
+      end
+
+      def include_all_explicitly?(included)
+        included.respond_to?(:each) && included.count == 1 && included.first == 'all'
+      end
     end
 
   end
