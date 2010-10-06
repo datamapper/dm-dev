@@ -312,7 +312,10 @@ Example:
     cd $DM_DEV_ROOT/dm-validations
 
     thor dm:sync           # same as passing: -i dm-validations
+    thor dm:list           # same as passing: -i dm-validations
     thor dm:bundle:install # same as passing: -i dm-validations
+    thor dm:bundle:update  # same as passing: -i dm-validations
+    thor dm:bundle:show    # same as passing: -i dm-validations
     thor dm:spec           # same as passing: -i dm-validations
     thor dm:implode        # same as passing: -i dm-validations
 
@@ -330,11 +333,14 @@ still pass any other additional options to the commands.
     #   :exclude     => %w[ dm-tags ]                              # overwrites ENV['EXCLUDE']
     #   :adapters    => %w[ in_memory yaml sqlite mysql postgres ] # overwrites ENV['ADAPTERS']
     #   :verbose     => false                                      # overwrites ENV['VERBOSE']
+    #   :benchmark   => false
     #
 
     DM.sync
+    DM.list
     DM.bundle_install
     DM.bundle_update
+    DM.bundle_show
     DM.spec
     DM.implode
 
