@@ -127,6 +127,17 @@ Note that for the specs to reliably work, you should sync
 depend on other DM gems and since we're running all specs with local
 code, we need to make sure that this code is available.
 
+Also note that for the DataMapper tests to run, you need to have two
+databases setup on all the adapters you want to test. The names for
+these databases are:
+
+    datamapper_default_tests
+    datamapper_alternate_tests
+
+The specs will connect to these databases using the `datamapper` user
+with password `datamapper`. Be sure to grant enough privileges to these
+users, on the above mentioned databases.
+
 ## Common options
 
 Every task can be configured with a few environment variables.
