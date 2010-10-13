@@ -167,6 +167,14 @@ overwrite the environment variable's value.
     thor dm:status          # Show git status information
     thor dm:sync            # Sync with the DM repositories
 
+## Using private github clone URLs
+
+If you have push access to any or all the DataMapper repositories, you
+can pass the `--development` or `-d` switch to the `thor dm:sync`
+command. This will use the private github clone URL and thus allow you
+to push your changes back without manually having to edit the
+`.git/config` file(s).
+
 ## Know what's going on
 
 Every task supports the `-p` or `--pretend` switch. When passed,

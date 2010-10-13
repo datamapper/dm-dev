@@ -490,22 +490,20 @@ class ::Project
         end
       end
 
-      attr_reader :git_uri
-
-      def initialize(repo, env, logger)
-        super
-        @git_uri = uri.dup
-        @git_uri.scheme = scheme
-      end
-
-      def scheme
-        'git'
-      end
 
       class Clone < Sync
 
+        def initialize(repo, env, logger)
+          super
+          @git_uri        = uri.dup
+          @git_uri.scheme = 'git'
+          if env.options[:development]
+            @git_uri.to_s.sub!('://', '@').sub!('/', ':')
+          end
+        end
+
         def command
-          "git clone #{git_uri}.git #{verbosity}"
+          "git clone #{@git_uri}.git #{verbosity}"
         end
 
         def working_dir
@@ -967,6 +965,7 @@ module DataMapper
       end
 
       desc 'sync', 'Sync with the DM repositories'
+      method_option :development, :type => :boolean, :aliases => '-d', :desc => 'Use the private github clone url if you have push access'
       def sync
         DataMapper::Project.sync(options)
       end
