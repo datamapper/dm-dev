@@ -1013,7 +1013,6 @@ module DataMapper
           DataMapper::Project.bundle_show(options)
         end
 
-
       end
 
     private
