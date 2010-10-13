@@ -953,17 +953,6 @@ module DataMapper
       include Thor::Actions
       include CommonOptions
 
-      class Meta < ::Thor
-
-        namespace 'dm:meta'
-
-        desc 'list', 'List locally known DM repositories'
-        def list
-          DataMapper::Project.list
-        end
-
-      end
-
       desc 'sync', 'Sync with the DM repositories'
       method_option :development, :type => :boolean, :aliases => '-d', :desc => 'Use the private github clone url if you have push access'
       def sync
@@ -1011,6 +1000,17 @@ module DataMapper
         desc 'show', 'Show the bundle content'
         def show
           DataMapper::Project.bundle_show(options)
+        end
+
+      end
+
+      class Meta < ::Thor
+
+        namespace 'dm:meta'
+
+        desc 'list', 'List locally known DM repositories'
+        def list
+          DataMapper::Project.list
         end
 
       end
