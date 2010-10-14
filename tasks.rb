@@ -532,39 +532,48 @@ class ::Project
     class Rvm < Command
 
       attr_reader :rubies
-      attr_reader :ruby
 
       def initialize(repo, env, logger)
         super
         @rubies = env.rubies
       end
 
-      def run
-        super do
-          rubies.each do |ruby|
-            @ruby = ruby
-            if block_given?
-              yield(ruby)
-            else
-              execute
+      def command
+        "rvm #{rubies.join(',')}"
+      end
+
+      class Exec < Rvm
+
+        attr_reader :ruby
+
+        def run
+          super do
+            rubies.each do |ruby|
+              @ruby = ruby
+              if block_given?
+                yield(ruby)
+              else
+                execute
+              end
             end
           end
         end
-      end
 
-    private
+      private
 
-      def command
-        "rvm #{@ruby} exec bash -c"
-      end
+        def command
+          "rvm #{@ruby} exec bash -c"
+        end
 
-      def action
-        "[#{@ruby}]"
+        def action
+          "[#{@ruby}]"
+        end
+
       end
 
     end
 
-    class Bundle < Rvm
+    class Bundle < Rvm::Exec
 
       class Install < Bundle
 
