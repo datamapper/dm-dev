@@ -13,7 +13,7 @@ require 'ruby-github'
 class ::Project
 
   def self.command_names
-    %w[ sync bundle:install bundle:update bundle:show spec release implode status list ]
+    %w[ sync bundle:install bundle:update bundle:show gem:install gem:uninstall spec release implode status list ]
   end
 
   def self.command_name(name)
@@ -722,6 +722,46 @@ class ::Project
 
     end
 
+    class Gem < Rvm
+
+      class Install < Gem
+
+        def command
+          "#{super} gem build #{gemspec_file}; gem install #{gem}"
+        end
+
+        def action
+          'Installing'
+        end
+
+      end
+
+      class Uninstall < Gem
+
+        def command
+          "#{super} gem uninstall #{repo.name} --version #{version}"
+        end
+
+        def action
+          'Uninstalling'
+        end
+
+      end
+
+      def gem
+        "#{working_dir.join(repo.name)}-#{version}.gem"
+      end
+
+      def gemspec_file
+        "#{working_dir.join(repo.name)}.gemspec"
+      end
+
+      def version
+        ::Gem::Specification.load(working_dir.join(gemspec_file)).version.to_s
+      end
+
+    end
+
     class Release < Command
 
       def run
@@ -1009,6 +1049,24 @@ module DataMapper
         desc 'show', 'Show the bundle content'
         def show
           DataMapper::Project.bundle_show(options)
+        end
+
+      end
+
+      class Gem < ::Thor
+
+        namespace 'dm:gem'
+
+        include CommonOptions
+
+        desc 'install', 'Install all included gems into the specified rubies'
+        def install
+          DataMapper::Project.gem_install(options)
+        end
+
+        desc 'uninstall', 'Uninstall all included gems from the specified rubies'
+        def uninstall
+          DataMapper::Project.gem_uninstall(options)
         end
 
       end
