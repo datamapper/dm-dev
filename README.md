@@ -140,6 +140,20 @@ The specs will connect to these databases using the `datamapper` user
 with password `datamapper`. Be sure to grant enough privileges to these
 users, on the above mentioned databases.
 
+## The available thor tasks
+
+    thor dm:bundle:install  # Bundle the DM repositories
+    thor dm:bundle:show     # Show the bundle content
+    thor dm:bundle:update   # Update the bundled DM repositories
+    thor dm:gem:install     # Install all included gems into the specified rubies
+    thor dm:gem:uninstall   # Uninstall all included gems from the specified rubies
+    thor dm:implode         # Delete all DM gems
+    thor dm:meta:list       # List locally known DM repositories
+    thor dm:release         # Release all DM gems to rubygems
+    thor dm:spec            # Run specs for DM gems
+    thor dm:status          # Show git status information
+    thor dm:sync            # Sync with the DM repositories
+
 ## Common options
 
 Every task can be configured with a few environment variables.
@@ -156,20 +170,6 @@ Any of these environment variables has an equivalent thor option as will be
 seen below. When a thor option is passed for which the respective
 environment variable has already been set too, the thor option will
 overwrite the environment variable's value.
-
-## The available thor tasks
-
-    thor dm:bundle:install  # Bundle the DM repositories
-    thor dm:bundle:show     # Show the bundle content
-    thor dm:bundle:update   # Update the bundled DM repositories
-    thor dm:gem:install     # Install all included gems into the specified rubies
-    thor dm:gem:uninstall   # Uninstall all included gems from the specified rubies
-    thor dm:implode         # Delete all DM gems
-    thor dm:meta:list       # List locally known DM repositories
-    thor dm:release         # Release all DM gems to rubygems
-    thor dm:spec            # Run specs for DM gems
-    thor dm:status          # Show git status information
-    thor dm:sync            # Sync with the DM repositories
 
 ## Using private github clone URLs
 
