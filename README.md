@@ -171,6 +171,16 @@ seen below. When a thor option is passed for which the respective
 environment variable has already been set too, the thor option will
 overwrite the environment variable's value.
 
+## Task specific options
+
+The `dm:gem:install`, `dm:gem:uninstall` and `dm:sync` tasks accept
+additional options to further configure their behavior. Both
+`dm:gem:install` and `dm:gem:uninstall` accept the `--gemset` or `-g`
+option that allows you to pass the name of the _rvm gemset_ you want to
+install or uninstall the gems to or from. If left out, the respective
+_global rvm gemsets_ will be used. Have a look at the section below for
+an explanation of `dm:sync`'s `--development` or `-d` option.
+
 ## Using private github clone URLs
 
 If you have push access to any or all the DataMapper repositories, you

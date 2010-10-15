@@ -748,6 +748,17 @@ class ::Project
 
       end
 
+      def before
+        create_gemset = "rvm gemset create #{gemset}"
+
+        log    create_gemset if verbose?
+        system create_gemset if gemset && !pretend?
+      end
+
+      def rubies
+        gemset ? super.map { |ruby| "#{ruby}@#{gemset}" } : super
+      end
+
       def gem
         "#{working_dir.join(repo.name)}-#{version}.gem"
       end
@@ -758,6 +769,10 @@ class ::Project
 
       def version
         ::Gem::Specification.load(working_dir.join(gemspec_file)).version.to_s
+      end
+
+      def gemset
+        env.options[:gemset]
       end
 
     end
@@ -1058,6 +1073,8 @@ module DataMapper
         namespace 'dm:gem'
 
         include CommonOptions
+
+        class_option :gemset, :type => :string, :aliases => '-g', :desc => 'The rvm gemset to install the gems to'
 
         desc 'install', 'Install all included gems into the specified rubies'
         def install
