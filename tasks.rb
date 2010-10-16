@@ -261,6 +261,7 @@ class ::Project
     attr_reader :excluded
     attr_reader :rubies
     attr_reader :bundle_root
+    attr_reader :gemset
 
     def initialize(name, options)
       @name        = name
@@ -272,6 +273,7 @@ class ::Project
       @rubies      = @options[:rubies ] || (ENV['RUBIES' ] ? normalize(ENV['RUBIES' ])  : default_rubies)
       @verbose     = @options[:verbose] || (ENV['VERBOSE'] == 'true')
       @pretend     = @options[:pretend] || (ENV['PRETEND'] == 'true')
+      @gemset      = @options[:gemset ] ||  ENV['GEMSET' ]
     end
 
     def default_bundle_root
@@ -749,14 +751,14 @@ class ::Project
       end
 
       def before
-        create_gemset = "rvm gemset create #{gemset}"
+        create_gemset = "rvm gemset create #{env.gemset}"
 
         log    create_gemset if verbose?
-        system create_gemset if gemset && !pretend?
+        system create_gemset if env.gemset && !pretend?
       end
 
       def rubies
-        gemset ? super.map { |ruby| "#{ruby}@#{gemset}" } : super
+        env.gemset ? super.map { |ruby| "#{ruby}@#{env.gemset}" } : super
       end
 
       def gem
@@ -769,10 +771,6 @@ class ::Project
 
       def version
         ::Gem::Specification.load(working_dir.join(gemspec_file)).version.to_s
-      end
-
-      def gemset
-        env.options[:gemset]
       end
 
     end
