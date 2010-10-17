@@ -35,16 +35,16 @@ class ::Project
       end
 
       def #{command_name(name)}
-        start = Time.now if options[:benchmark]
+        start = Time.now if env.benchmark?
         self.class.invoke :before, '#{command_name(name)}', env, repos
         @repos.each do |repo|
           @logger.progress!
           command_class('#{name}').new(repo, env, @logger).run
         end
         self.class.invoke :after, '#{command_name(name)}', env, repos
-        stop = Time.now if options[:benchmark]
+        stop = Time.now if env.benchmark?
 
-        if options[:benchmark]
+        if env.benchmark?
           puts '-------------------------------'
           puts "Time elapsed: \#{stop - start}"
           puts '-------------------------------'
@@ -268,12 +268,13 @@ class ::Project
       @options     = options
       @root        = Pathname(@options[:root       ] || ENV['DM_DEV_ROOT'       ]     || Dir.pwd)
       @bundle_root = Pathname(@options[:bundle_root] || ENV['DM_DEV_BUNDLE_ROOT']     || @root.join(default_bundle_root))
-      @included    = @options[:include] || (ENV['INCLUDE'] ? normalize(ENV['INCLUDE'])  : default_included)
-      @excluded    = @options[:exclude] || (ENV['EXCLUDE'] ? normalize(ENV['EXCLUDE'])  : default_excluded)
-      @rubies      = @options[:rubies ] || (ENV['RUBIES' ] ? normalize(ENV['RUBIES' ])  : default_rubies)
-      @verbose     = @options[:verbose] || (ENV['VERBOSE'] == 'true')
-      @pretend     = @options[:pretend] || (ENV['PRETEND'] == 'true')
-      @gemset      = @options[:gemset ] ||  ENV['GEMSET' ]
+      @included    = @options[:include  ] || (ENV['INCLUDE'  ] ? normalize(ENV['INCLUDE'])  : default_included)
+      @excluded    = @options[:exclude  ] || (ENV['EXCLUDE'  ] ? normalize(ENV['EXCLUDE'])  : default_excluded)
+      @rubies      = @options[:rubies   ] || (ENV['RUBIES'   ] ? normalize(ENV['RUBIES' ])  : default_rubies)
+      @verbose     = @options[:verbose  ] || (ENV['VERBOSE'  ] == 'true')
+      @pretend     = @options[:pretend  ] || (ENV['PRETEND'  ] == 'true')
+      @benchmark   = @options[:benchmark] || (ENV['BENCHMARK'] == 'true')
+      @gemset      = @options[:gemset   ] ||  ENV['GEMSET'   ]
     end
 
     def default_bundle_root
@@ -298,6 +299,10 @@ class ::Project
 
     def pretend?
       @pretend
+    end
+
+    def benchmark?
+      @benchmark
     end
 
   private
