@@ -164,7 +164,9 @@ Every task can be configured with a few environment variables.
     INCLUDE="dm-core dm-validations" # Makes sure that only these gems are used. When left out, all gems will be used
     EXCLUDE="dm-tags dm-ar-finders"  # Makes sure that these gems are not used
     ADAPTERS="mysql postgres"        # Use only these DM adapters
+    GEMSET=datamapper                # With dm:gem:install, install all gems into the "datamapper" gemset
     VERBOSE=true                     # Print out every shell command before executing it
+    BENCHMARK=true                   # Print the time the command took to execute
 
 Any of these environment variables has an equivalent thor option as will be
 seen below. When a thor option is passed for which the respective
