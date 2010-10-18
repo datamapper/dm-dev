@@ -169,7 +169,9 @@ Every task can be configured with a few environment variables.
 Any of these environment variables has an equivalent thor option as will be
 seen below. When a thor option is passed for which the respective
 environment variable has already been set too, the thor option will
-overwrite the environment variable's value.
+overwrite the environment variable's value. The same goes for using the
+Ruby API directly. Any of the passed in options (a Hash) overwrites any
+setting already configured via the environment variables.
 
 ## Task specific options
 
