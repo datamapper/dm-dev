@@ -114,7 +114,7 @@ folder, it's easy to get rid of it any time. Apart from obviously just
 deleting the folder, you can use `thor dm:implode` just for the fun of
 it.
 
-When the `INCLUDE` environment variable *is not specified*, all repositories will be deleted as well as the `DM_DEV_BUNDLE_ROOT`, meaning that you will have to re-bundle everything next time.
+When the `INCLUDE` environment variable *is not specified*, all repositories will be deleted as well as the `DM_DEV_BUNDLE_ROOT`, meaning that you will have to re-bundle everything next time. (Be aware that this might take a long time!)
 
 When the `INCLUDE` environment variable *is specified*, only the
 specified repositories will be deleted. The `DM_DEV_BUNDLE_ROOT` stays
@@ -122,9 +122,9 @@ untouched.
 
 ## Running specs
 
-The spec task uses the bundled DM sources to run the specs for all specified gems against all specified rubies and adapters. While running, it prints out a matrix, that shows for every ruby and every adapter if the specs `pass` or `fail`.
+The spec task runs specs for all specified gems against all specified rubies and adapters. While running, it prints out a matrix, that shows for every ruby and every adapter if the specs `pass` or `fail`. The spec task makes sure that only local DM sources are used so you can safely assume that you're running the specs against your latest modifications.
 
-Note that for the specs to reliably work, you should sync
+Note that for the specs to reliably work, you should `thor dm:sync`
 *all* DM repositories once. This is necessary because some gems might
 depend on other DM gems and since we're running all specs with local
 code, we need to make sure that this code is available.
