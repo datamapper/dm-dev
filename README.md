@@ -198,7 +198,7 @@ Here's an example invocation:
     thor dm:spec -i dm-aggregates -R 1.8.7 1.9.2 -a sqlite -- spec/isolated
 
 This would only run specs located in the `spec/isolated` folder. As
-always, you can pass the `-v` switch to see what command get executes.
+always, you can pass the `-v` switch to see the command that gets executed.
 
 ## Using private github clone URLs
 
