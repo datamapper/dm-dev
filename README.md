@@ -184,6 +184,22 @@ install or uninstall the gems to or from. If left out, the respective
 _global rvm gemsets_ will be used. Have a look at the section below for
 an explanation of `dm:sync`'s `--development` or `-d` option.
 
+### Support passing options on to the underlying command
+
+This is currently only supported for the `dm:spec` command where it can be
+used to run any specific spec folder(s) or file(s).
+
+The options can be passed by specifying them just like the underlying command
+would expect them. To separate these options from the task's options themselves,
+they need to be passed after a `--`.
+
+Here's an example invocation:
+
+    thor dm:spec -i dm-aggregates -R 1.8.7 1.9.2 -a sqlite -- spec/isolated
+
+This would only run specs located in the `spec/isolated` folder. As
+always, you can pass the `-v` switch to see what command get executes.
+
 ## Using private github clone URLs
 
 If you have push access to any or all the DataMapper repositories, you

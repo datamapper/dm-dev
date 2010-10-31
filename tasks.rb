@@ -262,6 +262,7 @@ class ::Project
     attr_reader :rubies
     attr_reader :bundle_root
     attr_reader :gemset
+    attr_reader :command
 
     def initialize(name, options)
       @name        = name
@@ -275,6 +276,7 @@ class ::Project
       @pretend     = @options[:pretend  ] || (ENV['PRETEND'  ] == 'true')
       @benchmark   = @options[:benchmark] || (ENV['BENCHMARK'] == 'true')
       @gemset      = @options[:gemset   ] ||  ENV['GEMSET'   ]
+      @command     = @options[:command  ] ||  nil
     end
 
     def default_bundle_root
@@ -712,7 +714,11 @@ class ::Project
       end
 
       def bundle_command
-        'exec rake spec'
+        if env.command
+          "exec spec #{env.command.join(' ')}"
+        else
+          'exec rake spec'
+        end
       end
 
       def action
@@ -1013,6 +1019,15 @@ module DataMapper
             class_option :benchmark,   :type => :boolean, :aliases => '-b', :desc => 'Print the time the command took to execute'
           end
         end
+
+        def options
+          if index = ARGV.index('--')
+            super.merge(:command => ARGV.slice(index + 1, ARGV.size - 1))
+          else
+            super
+          end
+        end
+
       end
 
       namespace :dm
