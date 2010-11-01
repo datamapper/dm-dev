@@ -265,18 +265,22 @@ class ::Project
     attr_reader :command_options
 
     def initialize(name, options)
-      @name        = name
-      @options     = options
-      @root        = Pathname(@options[:root       ] || ENV['DM_DEV_ROOT'       ]     || Dir.pwd)
-      @bundle_root = Pathname(@options[:bundle_root] || ENV['DM_DEV_BUNDLE_ROOT']     || @root.join(default_bundle_root))
-      @included    = @options[:include  ] || (ENV['INCLUDE'  ] ? normalize(ENV['INCLUDE'])  : default_included)
-      @excluded    = @options[:exclude  ] || (ENV['EXCLUDE'  ] ? normalize(ENV['EXCLUDE'])  : default_excluded)
-      @rubies      = @options[:rubies   ] || (ENV['RUBIES'   ] ? normalize(ENV['RUBIES' ])  : default_rubies)
-      @verbose     = @options[:verbose  ] || (ENV['VERBOSE'  ] == 'true')
-      @pretend     = @options[:pretend  ] || (ENV['PRETEND'  ] == 'true')
-      @benchmark   = @options[:benchmark] || (ENV['BENCHMARK'] == 'true')
-      @gemset      = @options[:gemset   ] ||  ENV['GEMSET'   ]
+      @name            = name
+      @options         = options
+      @root            = @options[:root           ] ||  ENV['DM_DEV_ROOT'       ] || Dir.pwd
+      @bundle_root     = @options[:bundle_root    ] ||  ENV['DM_DEV_BUNDLE_ROOT'] || @root.join(default_bundle_root)
+      @included        = @options[:include        ] || (ENV['INCLUDE'           ]  ? normalize(ENV['INCLUDE']) : default_included)
+      @excluded        = @options[:exclude        ] || (ENV['EXCLUDE'           ]  ? normalize(ENV['EXCLUDE']) : default_excluded)
+      @rubies          = @options[:rubies         ] || (ENV['RUBIES'            ]  ? normalize(ENV['RUBIES' ]) : default_rubies)
+      @verbose         = @options[:verbose        ] || (ENV['VERBOSE'           ] == 'true')
+      @pretend         = @options[:pretend        ] || (ENV['PRETEND'           ] == 'true')
+      @benchmark       = @options[:benchmark      ] || (ENV['BENCHMARK'         ] == 'true')
+      @gemset          = @options[:gemset         ] ||  ENV['GEMSET'            ]
       @command_options = @options[:command_options] ||  nil
+
+      # make these Pathnames for convenience
+      @root            = Pathname(@root)
+      @bundle_root     = Pathname(@bundle_root)
     end
 
     def default_bundle_root
