@@ -35,19 +35,23 @@ class ::Project
       end
 
       def #{command_name(name)}
+
         start = Time.now if env.benchmark?
+
         self.class.invoke :before, '#{command_name(name)}', env, repos
         @repos.each do |repo|
           @logger.progress!
           command_class('#{name}').new(repo, env, @logger).run
         end
         self.class.invoke :after, '#{command_name(name)}', env, repos
-        stop = Time.now if env.benchmark?
 
         if env.benchmark?
-          puts '-------------------------------'
-          puts "Time elapsed: \#{stop - start}"
-          puts '-------------------------------'
+
+          elapsed = (Time.now - start).to_i
+
+          puts '-----------------------------------------'
+          puts "Time elapsed: \#{formatted_time(elapsed)}"
+          puts '-----------------------------------------'
         end
       end
     RUBY
@@ -90,6 +94,14 @@ class ::Project
     hooks = instance_variable_get("@#{kind}")
     return unless hooks && hooks[name]
     hooks[name].each { |hook| hook.call(*args) }
+  end
+
+  def formatted_time(time)
+    hours   = (time / 3600).to_i
+    minutes = (time / 60 - hours * 60).to_i
+    seconds = (time - (minutes * 60 + hours * 3600))
+
+    "%02d:%02d:%02d" % [hours, minutes, seconds]
   end
 
   class Metadata
