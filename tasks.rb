@@ -700,7 +700,7 @@ class ::Project
 
         if print_matrix?
           puts  "\nh2. %s\n\n"   % repo.name
-          puts  '| RUBY  | %s |' % env.adapters.join(' | ')
+          puts  '| RUBY  | %s |' % env.adapters(repo).join(' | ')
         end
 
         super do |ruby|
@@ -891,8 +891,6 @@ module DataMapper
 
     class Environment < ::Project::Environment
 
-      attr_reader :adapters
-
       def initialize(name, options)
         super
         @adapters ||= options[:adapters] || (ENV['ADAPTERS'] ? normalize(ENV['ADAPTERS']) : default_adapters)
@@ -904,6 +902,12 @@ module DataMapper
 
       def default_excluded
         %w[ dm-oracle-adapter dm-sqlserver-adapter ]
+      end
+
+      def adapters(repo)
+        available_adapters = @adapters
+        specific_adapters  = available_adapters.select { |adapter| repo.name =~ /#{adapter}/ }
+        specific_adapters.empty? ? available_adapters : specific_adapters
       end
 
     end
@@ -995,7 +999,7 @@ module DataMapper
 
       def run
         super do |ruby|
-          env.adapters.each do |adapter|
+          env.adapters(repo).each do |adapter|
             @adapter = adapter # HACK?
 
             execute
