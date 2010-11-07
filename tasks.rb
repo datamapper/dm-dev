@@ -48,10 +48,12 @@ class ::Project
         if env.benchmark?
 
           elapsed = (Time.now - start).to_i
+          message = "Finished 'dm:#{name}' in \#{formatted_time(elapsed)}"
 
-          puts '-----------------------------------------'
-          puts "Time elapsed: \#{formatted_time(elapsed)}"
-          puts '-----------------------------------------'
+          puts
+          puts '-' * message.length
+          puts message
+          puts '-' * message.length
         end
       end
     RUBY
