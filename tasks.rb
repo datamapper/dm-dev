@@ -602,10 +602,6 @@ class ::Project
           'install'
         end
 
-        def action
-          "#{super} bundle install"
-        end
-
       end
 
       class Update < Bundle
@@ -614,20 +610,12 @@ class ::Project
           'update'
         end
 
-        def action
-          "#{super} bundle update"
-        end
-
       end
 
       class Show < Bundle
 
         def bundle_command
           'show'
-        end
-
-        def action
-          "#{super} bundle show"
         end
 
       end
@@ -650,6 +638,10 @@ class ::Project
 
       def command
         "#{super} \"#{environment} bundle #{bundle_command} #{options} #{verbosity}\""
+      end
+
+      def action
+        "#{super} bundle #{bundle_command}"
       end
 
       def environment
