@@ -914,8 +914,8 @@ module DataMapper
         ruby == '1.8.6' ? 'EXTLIB="true"' : ''
       end
 
-      def adapters
-        env.adapters.join(' ')
+      def adapters(repo)
+        env.adapters(repo).join(' ')
       end
 
       def master_gemfile
@@ -941,7 +941,7 @@ module DataMapper
       module Manipulation
 
         def environment
-          "#{super} ADAPTERS='#{adapters}'"
+          "#{super} ADAPTERS='#{adapters(repo)}'"
         end
 
       end
