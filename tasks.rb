@@ -287,6 +287,7 @@ class ::Project
       @excluded        = @options[:exclude             ] || (ENV['EXCLUDE'           ]  ? normalize(ENV['EXCLUDE']) : default_excluded)
       @rubies          = @options[:rubies              ] || (ENV['RUBIES'            ]  ? normalize(ENV['RUBIES' ]) : default_rubies)
       @verbose         = @options[:verbose             ] || (ENV['VERBOSE'           ] == 'true')
+      @silent          = @options[:silent              ] || (ENV['SILENT'            ] == 'true')
       @pretend         = @options[:pretend             ] || (ENV['PRETEND'           ] == 'true')
       @benchmark       = @options[:benchmark           ] || (ENV['BENCHMARK'         ] == 'true')
       @gemset          = @options[:gemset              ] ||  ENV['GEMSET'            ]
@@ -311,6 +312,10 @@ class ::Project
 
     def verbose?
       @verbose
+    end
+
+    def silent?
+      @silent
     end
 
     def pretend?
@@ -343,6 +348,7 @@ class ::Project
     end
 
     def log(repo, action, command = nil, msg = nil)
+      return if @env.silent?
       command = command.to_s.squeeze(' ').strip # TODO also do for actually executed commands
       if @pretend || @verbose
         puts command
@@ -996,7 +1002,7 @@ module DataMapper
       include DataMapper::Project::Bundle
 
       def before
-        DataMapper::Project.bundle_install(env.options) unless bundled?
+        DataMapper::Project.bundle_install(env.options.merge(:silent => true)) unless bundled?
       end
 
       def run
@@ -1034,6 +1040,7 @@ module DataMapper
             class_option :adapters,    :type => :array,   :aliases => '-a', :desc => 'The DM adapters to use with this command (overwrites ADAPTERS)'
             class_option :pretend,     :type => :boolean, :aliases => '-p', :desc => 'Print the shell commands that would get executed'
             class_option :verbose,     :type => :boolean, :aliases => '-v', :desc => 'Print the shell commands being executed'
+            class_option :silent,      :type => :boolean, :aliases => '-s', :desc => "Don't print anything to $stdout"
             class_option :benchmark,   :type => :boolean, :aliases => '-b', :desc => 'Print the time the command took to execute'
           end
         end
