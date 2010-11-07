@@ -656,6 +656,10 @@ class ::Project
         "Gemfile.#{ruby}"
       end
 
+      def bundled?
+        working_dir.join("Gemfile.#{ruby}.local.lock").file?
+      end
+
       def make_gemfile
         unless working_dir.join(gemfile).file?
           master = working_dir.join(master_gemfile)
@@ -988,6 +992,10 @@ module DataMapper
     class Spec < ::Project::Command::Spec
 
       include DataMapper::Project::Bundle
+
+      def before
+        DataMapper::Project.bundle_install(env.options) unless bundled?
+      end
 
       def run
         super do |ruby|
