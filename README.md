@@ -208,6 +208,33 @@ command. This will use the private github clone URL and thus allow you
 to push your changes back without manually having to edit the
 `.git/config` file(s).
 
+## Setting up a DataMapper development environment
+
+All the `dm-dev` tasks rely on a common set of environment variables
+that are used to determine a few things necessary for `dm-dev` to do its
+thing.
+
+    # You should probably set this! (defaults to Dir.pwd)
+    # Every dm:* task assumes that sources are located in that directory.
+    export DM_DEV_ROOT=/path/to/the/datamapper/sources
+
+    # Those should have reasonable defaults but you can still tweak them
+    export DM_DEV_BUNDLE_ROOT=/path/to/where/bundler/manages/dm/sources
+    export DM_DEV_RUBIES="1.8.7 1.9.2 jruby rbx"
+    export DM_DEV_GEMSET="datamapper"
+    export DM_DEV_INCLUDE="some dm gems to include"
+    export DM_DEV_EXCLUDE="some dm gems to exclude"
+
+You can put those environment variable exports into your
+`~/.bash_profile` for example.
+
+Once you have the basics configured, `thor dm:sync` will clone all
+DataMapper sources to `DM_DEV_ROOT`. With all sources synced, you're
+ready to run specs for all the DataMapper gems. Running `thor dm:spec`
+right away will perform a `thor dm:bundle:install` if it thinks that
+this is still necessary. Obviously, you can also call `thor
+dm:bundle:install` manually before running the specs.
+
 ## Know what's going on
 
 Every task supports the `-p` or `--pretend` switch. When passed,
