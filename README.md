@@ -113,9 +113,9 @@ folder, it's easy to get rid of it any time. Apart from obviously just
 deleting the folder, you can use `thor dm:implode` just for the fun of
 it.
 
-When the `INCLUDE` environment variable *is not specified*, all repositories will be deleted as well as the `DM_DEV_BUNDLE_ROOT`, meaning that you will have to re-bundle everything next time. (Be aware that this might take a long time!)
+When the `DM_DEV_INCLUDE` environment variable *is not specified*, all repositories will be deleted as well as the `DM_DEV_BUNDLE_ROOT`, meaning that you will have to re-bundle everything next time. (Be aware that this might take a long time!)
 
-When the `INCLUDE` environment variable *is specified*, only the
+When the `DM_DEV_INCLUDE` environment variable *is specified*, only the
 specified repositories will be deleted. The `DM_DEV_BUNDLE_ROOT` stays
 untouched.
 
@@ -157,15 +157,15 @@ users, on the above mentioned databases.
 
 Every task can be configured with a few environment variables.
 
-    DM_DEV_ROOT=/some/path           # Points to where the DM sources will be installed and used
-    DM_DEV_BUNDLE_ROOT=/some/path    # Points to where bundler will install all it's data
-    RUBIES="1.8.7 1.9.2"             # The rvm ruby interpreters to use
-    INCLUDE="dm-core dm-validations" # Makes sure that only these gems are used. When left out, all gems will be used
-    EXCLUDE="dm-tags dm-ar-finders"  # Makes sure that these gems are not used
-    ADAPTERS="mysql postgres"        # Use only these DM adapters
-    GEMSET=datamapper                # With dm:gem:install, install all gems into the "datamapper" gemset
-    VERBOSE=true                     # Print out every shell command before executing it
-    BENCHMARK=true                   # Print the time the command took to execute
+    DM_DEV_ROOT=/some/path                  # Points to where the DM sources will be installed and used
+    DM_DEV_BUNDLE_ROOT=/some/path           # Points to where bundler will install all it's data
+    DM_DEV_RUBIES="1.8.7 1.9.2"             # The rvm ruby interpreters to use
+    DM_DEV_INCLUDE="dm-core dm-validations" # Makes sure that only these gems are used. When left out, all gems will be used
+    DM_DEV_EXCLUDE="dm-tags dm-ar-finders"  # Makes sure that these gems are not used
+    ADAPTERS="mysql postgres"               # Use only these DM adapters
+    DM_DEV_GEMSET=datamapper                # With dm:gem:install, install all gems into the "datamapper" gemset
+    VERBOSE=true                            # Print out every shell command before executing it
+    BENCHMARK=true                          # Print the time the command took to execute
 
 Any of these environment variables has an equivalent thor option as will be
 seen below. When a thor option is passed for which the respective
@@ -284,13 +284,13 @@ Obviously your results may differ.
     Options:
       -v, [--verbose]                  # Print the shell commands being executed
       -a, [--adapters=one two three]   # The DM adapters to use with this command (overwrites ADAPTERS)
-      -i, [--include=one two three]    # The DM gems to include with this command (overwrites INCLUDE)
+      -i, [--include=one two three]    # The DM gems to include with this command (overwrites DM_DEV_INCLUDE)
       -r, [--root=ROOT]                # The directory where all DM source code is stored (overwrites DM_DEV_ROOT)
       -b, [--benchmark]                # Print the time the command took to execute
-      -R, [--rubies=one two three]     # The rvm ruby interpreters to use with this command (overwrites RUBIES)
+      -R, [--rubies=one two three]     # The rvm ruby interpreters to use with this command (overwrites DM_DEV_RUBIES)
       -p, [--pretend]                  # Print the shell commands that would get executed
       -B, [--bundle-root=BUNDLE_ROOT]  # The directory where bundler stores all its data (overwrites DM_DEV_BUNDLE_ROOT)
-      -e, [--exclude=one two three]    # The DM gems to exclude with this command (overwrites EXCLUDE)
+      -e, [--exclude=one two three]    # The DM gems to exclude with this command (overwrites DM_DEV_EXCLUDE)
 
 
     ree-1.8.7-2010.02 mungo:dm-dev snusnu$ thor dm:sync -i dm-validations dm-constraints
@@ -380,9 +380,9 @@ still pass any other additional options to the commands.
     #
     #   :root        => "/path/to/store/dm/sources"                # overwrites ENV['DM_DEV_ROOT']
     #   :bundle_root => "/path/to/store/dm/bundler/data"           # overwrites ENV['DM_DEV_BUNDLE_ROOT']
-    #   :rubies      => %w[ 1.8.7 1.9.2 jruby rbx ]                # overwrites ENV['RUBIES']
-    #   :include     => %w[ dm-core dm-validations ]               # overwrites ENV['INCLUDE']
-    #   :exclude     => %w[ dm-tags ]                              # overwrites ENV['EXCLUDE']
+    #   :rubies      => %w[ 1.8.7 1.9.2 jruby rbx ]                # overwrites ENV['DM_DEV_RUBIES']
+    #   :include     => %w[ dm-core dm-validations ]               # overwrites ENV['DM_DEV_INCLUDE']
+    #   :exclude     => %w[ dm-tags ]                              # overwrites ENV['DM_DEV_EXCLUDE']
     #   :adapters    => %w[ in_memory yaml sqlite mysql postgres ] # overwrites ENV['ADAPTERS']
     #   :verbose     => false                                      # overwrites ENV['VERBOSE']
     #   :benchmark   => false

@@ -283,14 +283,14 @@ class ::Project
       @options         = options
       @root            = Pathname(@options[:root       ] ||  ENV['DM_DEV_ROOT'       ] || Dir.pwd)
       @bundle_root     = Pathname(@options[:bundle_root] ||  ENV['DM_DEV_BUNDLE_ROOT'] || @root.join(default_bundle_root))
-      @included        = @options[:include             ] || (ENV['INCLUDE'           ]  ? normalize(ENV['INCLUDE']) : default_included)
-      @excluded        = @options[:exclude             ] || (ENV['EXCLUDE'           ]  ? normalize(ENV['EXCLUDE']) : default_excluded)
-      @rubies          = @options[:rubies              ] || (ENV['RUBIES'            ]  ? normalize(ENV['RUBIES' ]) : default_rubies)
+      @rubies          = @options[:rubies              ] || (ENV['DM_DEV_RUBIES'     ]  ? normalize(ENV['DM_DEV_RUBIES' ]) : default_rubies)
+      @included        = @options[:include             ] || (ENV['DM_DEV_INCLUDE'    ]  ? normalize(ENV['DM_DEV_INCLUDE']) : default_included)
+      @excluded        = @options[:exclude             ] || (ENV['DM_DEV_EXCLUDE'    ]  ? normalize(ENV['DM_DEV_EXCLUDE']) : default_excluded)
+      @gemset          = @options[:gemset              ] ||  ENV['DM_DEV_GEMSET'     ]
       @verbose         = @options[:verbose             ] || (ENV['VERBOSE'           ] == 'true')
       @silent          = @options[:silent              ] || (ENV['SILENT'            ] == 'true')
       @pretend         = @options[:pretend             ] || (ENV['PRETEND'           ] == 'true')
       @benchmark       = @options[:benchmark           ] || (ENV['BENCHMARK'         ] == 'true')
-      @gemset          = @options[:gemset              ] ||  ENV['GEMSET'            ]
       @command_options = @options[:command_options     ] ||  nil
     end
 
