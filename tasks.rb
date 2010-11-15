@@ -108,14 +108,14 @@ class ::Project
 
   class Metadata
 
-    class Loader
+    class Source
 
-      def self.new(filename)
-        return super if self < Loader
+      def self.new(filename, *args)
+        return super if self < Source
         if filename.file?
-          YamlLoader.new(filename)
+          Yaml.new(filename)
         else
-          GithubLoader.new(filename)
+          Github.new(filename, *args)
         end
       end
 
@@ -129,33 +129,38 @@ class ::Project
         raise NotImplementedError
       end
 
-    end
-
-    class GithubLoader < Loader
-
-      def load
-        cache(GitHub::API.user(name).repositories, filename)
-      end
-
-    private
-
-      def cache(repos, filename)
+      def save(repositories)
         File.open(filename, 'w') do |f|
           f.write(YAML.dump({
-            'repositories' => repos.map { |repo| { 'name' => repo.name, 'url' => repo.url } }
+            'repositories' => repositories.map { |repo| { 'name' => repo['name'], 'url' => repo['url'] } }
           }))
         end
-        repos
+        repositories
       end
 
-    end
+      class Github < Source
 
-    class YamlLoader < Loader
+        attr_reader :username
 
-      def load
-        YAML.load(File.open(filename))['repositories'].map do |repo|
-          Struct.new(:name, :url).new(repo['name'], repo['url'])
+        def initialize(filename, username)
+          super(filename)
+          @username = username
         end
+
+        def load
+          save(GitHub::API.user(username).repositories)
+        end
+
+      end
+
+      class Yaml< Source
+
+        def load
+          YAML.load(File.open(filename))['repositories'].map do |repo|
+            Struct.new(:name, :url).new(repo['name'], repo['url'])
+          end
+        end
+
       end
 
     end
@@ -163,19 +168,22 @@ class ::Project
     attr_reader :root
     attr_reader :name
     attr_reader :repositories
+    attr_reader :filename
 
-    def self.fetch(root, name)
+    def self.load(root, name)
       new(root, name).repositories
     end
 
     def initialize(root, name)
       @root, @name  = root, name
-      @repositories = fetch
+      @filename     = @root.join(config_file_name)
+      @source       = Source.new(@filename, name)
+      @repositories = @source.load
     end
 
-    def fetch
-      filename = root.join(config_file_name)
-      Loader.new(filename).load
+    def save
+      @source.save(repositories)
+      self
     end
 
     def config_file_name
@@ -216,7 +224,7 @@ class ::Project
       @root, @user    = root, user
       @repos          = repos
       @excluded_repos = excluded_repos
-      @metadata       = Metadata.fetch(@root, @user)
+      @metadata       = Metadata.new(@root, @user)
       @repositories   = selected_repositories.map do |repo|
         Repository.new(@root, repo)
       end
@@ -226,13 +234,18 @@ class ::Project
       @repositories.each { |repo| yield(repo) }
     end
 
+    def add(name, url)
+      @metadata.repositories << { 'name' => name, 'url' => url }
+      @metadata.save
+    end
+
   private
 
     def selected_repositories
       if use_current_directory?
-        @metadata.select { |repo| managed_repo?(repo) }
+        @metadata.repositories.select { |repo| managed_repo?(repo) }
       else
-        @metadata.select { |repo| include_repo?(repo) }
+        @metadata.repositories.select { |repo| include_repo?(repo) }
       end
     end
 
@@ -257,7 +270,7 @@ class ::Project
     end
 
     def inside_available_repo?
-      @metadata.map(&:name).include?(relative_path_name)
+      @metadata.repositories.map(&:name).include?(relative_path_name)
     end
 
     def include_all?
@@ -1165,6 +1178,13 @@ module DataMapper
         desc 'list', 'List locally known DM repositories'
         def list
           DataMapper::Project.list
+        end
+
+        desc 'add', 'Add a new gem to the list of gems to test'
+        method_option :name, :type => :string, :aliases => '-n', :desc => 'The name of the gem to add'
+        method_option :url,  :type => :string, :aliases => '-u', :desc => 'The git(hub) repo url that contains the gem to add'
+        def add
+          DataMapper::Project.new(options).repos.add(options[:name], options[:url])
         end
 
       end

@@ -490,4 +490,18 @@ The following IRB session demonstrate a typical workflow. The API used in this s
     | rbx | pass | pass | pass | pass | pass |
      => nil
 
+## Adding new gems
+
+You can instruct the thor tasks to take other gems into account too. All
+you need to do is make sure that the cached repository configuration
+contains entries for all the gems you want to test.
+
+You can achieve this either by simply editing the
+`#{DM_DEV_ROOT}/dm-dev.yml` file by hand, or by running the following
+command:
+
+    thor dm:meta:add -n your_gem_name -u http://github.com/you/and_your_gem
+
+Subsequent operations will take the newly added gem into account,
+given that it provides a `Gemfile` and a `rake spec` spec task.
 
