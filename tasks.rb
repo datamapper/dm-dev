@@ -190,6 +190,10 @@ class ::Project
       'dm-dev.yml'
     end
 
+    def include?(url)
+      repositories.map { |repo| repo.url}.include?(url)
+    end
+
   end
 
   module Utils
@@ -235,8 +239,12 @@ class ::Project
     end
 
     def add(name, url)
-      @metadata.repositories << { 'name' => name, 'url' => url }
-      @metadata.save
+      if @metadata.include?(url)
+        puts "#{url} is already managed by dm-dev"
+      else
+        @metadata.repositories << Struct.new(:name, :url).new(name, url)
+        @metadata.save
+      end
     end
 
   private
