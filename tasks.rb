@@ -713,7 +713,7 @@ class ::Project
       end
 
       def bundled?
-        working_dir.join("Gemfile.#{ruby}.local.lock").file?
+        working_dir.join("Gemfile.#{ruby}.lock").file?
       end
 
       def make_gemfile
@@ -978,24 +978,16 @@ module DataMapper
         env.adapters(repo).join(' ')
       end
 
-      def master_gemfile
-        'Gemfile.local'
-      end
-
-      def gemfile
-        "#{super}#{local_install? ? '.local' : ''}"
-      end
-
-      def local_install?
-        working_dir.join("Gemfile.local").file?
-      end
-
       def ignored_repos
         %w[ dm-dev data_mapper datamapper.github.com dm-ferret-adapter rails_datamapper ]
       end
 
       def timeout
         2
+      end
+
+      def environment
+        "#{super} SOURCE=path"
       end
 
       module Manipulation
@@ -1010,18 +1002,6 @@ module DataMapper
 
         include DataMapper::Project::Bundle
         include DataMapper::Project::Bundle::Manipulation
-
-        def before
-          unless local_install?
-            log local_gemfile_command
-            system local_gemfile_command unless pretend?
-          end
-          super
-        end
-
-        def local_gemfile_command
-          "rake local_gemfile #{verbosity}"
-        end
 
         def options
           '--without quality'
