@@ -532,7 +532,7 @@ class ::Project
     end
 
     def silent
-      '>& /dev/null'
+       ' > /dev/null 2>&1'
     end
 
     # overwrite in subclasses
