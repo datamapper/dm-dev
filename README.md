@@ -139,6 +139,11 @@ The specs will connect to these databases using the `datamapper` user
 with password `datamapper`. Be sure to grant enough privileges to these
 users, on the above mentioned databases.
 
+You can override user and password by setting the following ENV vars:
+
+    export DM_DB_USER=your_db_user
+    export DM_DB_PASSWORD=your_db_password
+
 ## The available thor tasks
 
     thor dm:bundle:install  # Bundle the DM repositories
