@@ -979,7 +979,7 @@ module DataMapper
       end
 
       def ignored_repos
-        %w[ dm-dev data_mapper datamapper.github.com dm-ferret-adapter rails_datamapper dm-do-adapter]
+        %w[ dm-dev data_mapper datamapper.github.com dm-ferret-adapter rails_datamapper dm-rails dm-do-adapter]
       end
 
       def timeout
