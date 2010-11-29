@@ -77,6 +77,7 @@ your screen.
     ree-1.8.7-2010.02@datamapper mungo:dm-dev snusnu$ thor -T
     dm
     --
+    thor dm:bundle:force    # Force rebundling by removing all Gemfile.platform and Gemfile.platform.lock files
     thor dm:bundle:install  # Bundle the DM repositories
     thor dm:bundle:show     # Show the bundle content
     thor dm:bundle:update   # Update the bundled DM repositories
@@ -146,6 +147,7 @@ You can override user and password by setting the following ENV vars:
 
 ## The available thor tasks
 
+    thor dm:bundle:force    # Force rebundling by removing all Gemfile.platform and Gemfile.platform.lock files
     thor dm:bundle:install  # Bundle the DM repositories
     thor dm:bundle:show     # Show the bundle content
     thor dm:bundle:update   # Update the bundled DM repositories

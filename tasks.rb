@@ -13,7 +13,7 @@ require 'ruby-github'
 class ::Project
 
   def self.command_names
-    %w[ sync bundle:install bundle:update bundle:show gem:install gem:uninstall spec release implode status list ]
+    %w[ sync bundle:install bundle:update bundle:show bundle:force gem:install gem:uninstall spec release implode status list ]
   end
 
   def self.command_name(name)
@@ -676,6 +676,13 @@ class ::Project
 
       end
 
+      class Force < ::Project::Command
+
+        def command
+          'rm Gemfile.*'
+        end
+
+      end
 
       def initialize(repo, env, logger)
         super
@@ -1135,6 +1142,11 @@ module DataMapper
         desc 'show', 'Show the bundle content'
         def show
           DataMapper::Project.bundle_show(options)
+        end
+
+        desc 'force', 'Force rebundling by removing all Gemfile.platform and Gemfile.platform.lock files'
+        def force
+          DataMapper::Project.bundle_force(options)
         end
 
       end
