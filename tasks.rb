@@ -9,11 +9,13 @@ require 'pathname'
 require 'thor'
 require 'addressable/uri'
 require 'ruby-github'
+require 'json'
+require 'rest_client'
 
 class ::Project
 
   def self.command_names
-    %w[ sync bundle:install bundle:update bundle:show bundle:force gem:install gem:uninstall spec release implode status list ]
+    %w[ sync bundle:install bundle:update bundle:show bundle:force gem:install gem:uninstall spec release implode status list ci ]
   end
 
   def self.command_name(name)
@@ -55,6 +57,8 @@ class ::Project
           puts message
           puts '-' * message.length
         end
+
+        results
       end
     RUBY
   end
@@ -931,6 +935,88 @@ end
 
 module DataMapper
 
+  module CI
+
+    SERVICE_URL = ENV['TESTOR_SERVER'] || 'http://localhost:9292'
+
+    class Client
+
+      class Job
+
+        attr_reader :id
+        attr_reader :platform
+        attr_reader :adapter
+        attr_reader :library
+
+        attr_reader :data
+        attr_reader :success
+
+        def initialize(data)
+          @id       = data['id']
+          @platform = data['platform']['name']
+          @adapter  = data['adapter' ]['name']
+          @library  = data['library' ]['name']
+          @data     = data
+          @success  = false
+        end
+
+        def run
+          @running = true
+          if accept
+            execute
+            report
+          end
+          @running = false
+          @success
+        end
+
+        def accept
+          puts "\nACCEPTING: job = #{self.id}, gem = #{library}, platform = #{platform}, adapter = #{adapter}"
+          response = JSON.parse(RestClient.post("#{CI::SERVICE_URL}/jobs/accept", { :id => self.id }))
+          response['accepted']
+        end
+
+        def execute
+          results  = DataMapper::Project.spec(:include => [library], :rubies => [platform], :adapters => [adapter])
+          @success = results.all? { |success| success }
+        end
+
+        def report
+          RestClient.post("#{CI::SERVICE_URL}/jobs/report", :report => { :job_id => self.id, :green => @success })
+        end
+
+        def running?
+          @running
+        end
+
+      end # class Job
+
+      def initialize
+        @previous_jobs = []
+      end
+
+      def run
+        while true
+          if job = next_job
+            job.run
+            @previous_jobs << job.id
+          else
+            sleep(ENV['TESTOR_SLEEP_RHYTHM'] || 30)
+            puts "Looking for jobs ..."
+          end
+        end
+      end
+
+    private
+
+      def next_job
+        job_data = JSON.parse(RestClient.get("#{CI::SERVICE_URL}/jobs/next", { :params => { :previous_jobs => @previous_jobs.join(',') }}))
+        job_data.empty? ? nil : Client::Job.new(job_data)
+      end
+
+    end # class Client
+  end # module CI
+
   class Project < ::Project
 
     def initialize(options = {})
@@ -1194,6 +1280,17 @@ module DataMapper
         method_option :url,  :type => :string, :aliases => '-u', :desc => 'The git(hub) repo url that contains the gem to add'
         def add
           DataMapper::Project.new(options).repos.add(options[:name], options[:url])
+        end
+
+      end
+
+      class Ci < ::Thor
+
+        namespace 'dm:ci'
+
+        desc 'client', 'Start a client that fetches and executes DataMapper CI jobs'
+        def client
+          DataMapper::CI::Client.new.run
         end
 
       end
