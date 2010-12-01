@@ -991,8 +991,10 @@ module DataMapper
 
       end # class Job
 
-      def initialize
-        @previous_jobs = []
+      def initialize(options)
+        @sleep_period   = options[:sleep_period  ] || ENV['TESTOR_SLEEP_PERIOD'  ] || 60
+        @stop_when_done = options[:stop_when_done] || ENV['TESTOR_STOP_WHEN_DONE'] || true
+        @previous_jobs  = [] # TODO remember those
       end
 
       def run
@@ -1001,8 +1003,11 @@ module DataMapper
             job.run
             @previous_jobs << job.id
           else
-            sleep(ENV['TESTOR_SLEEP_RHYTHM'] || 30)
-            puts "Looking for jobs ..."
+            if @stop_when_done
+              exit(0)
+            else
+              sleep(@sleep_period)
+            end
           end
         end
       end
@@ -1289,8 +1294,10 @@ module DataMapper
         namespace 'dm:ci'
 
         desc 'client', 'Start a client that fetches and executes DataMapper CI jobs'
+        method_option :sleep_period,   :type => :numeric, :aliases => '-w', :desc => 'When no jobs are available, sleep that many seconds before asking again'
+        method_option :stop_when_done, :type => :boolean, :aliases => '-x', :desc => 'Stop when no more jobs are available'
         def client
-          DataMapper::CI::Client.new.run
+          DataMapper::CI::Client.new.run(options)
         end
 
       end
