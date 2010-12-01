@@ -1297,7 +1297,7 @@ module DataMapper
         method_option :sleep_period,   :type => :numeric, :aliases => '-w', :desc => 'When no jobs are available, sleep that many seconds before asking again'
         method_option :stop_when_done, :type => :boolean, :aliases => '-x', :desc => 'Stop when no more jobs are available'
         def client
-          DataMapper::CI::Client.new.run(options)
+          DataMapper::CI::Client.new(options).run
         end
 
       end
