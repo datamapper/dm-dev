@@ -41,7 +41,7 @@ class ::Project
         self.class.invoke :before, '#{command_name(name)}', env, repos
         @repos.each do |repo|
           @logger.progress!
-          command_class('#{name}').new(repo, env, @logger).run
+          results << command_class('#{name}').new(repo, env, @logger).run
         end
         self.class.invoke :after, '#{command_name(name)}', env, repos
 
@@ -63,6 +63,7 @@ class ::Project
   attr_reader   :root
   attr_reader   :repos
   attr_reader   :options
+  attr_reader   :results
 
   attr_accessor :commands
 
@@ -73,6 +74,7 @@ class ::Project
     @repos    = Repositories.new(@root, name, @env.included, @env.excluded + excluded_repos)
     @logger   = Logger.new(@env, @repos.count)
     @commands = {}
+    @results  = []
   end
 
   def environment_class
@@ -432,6 +434,7 @@ class ::Project
       @uri     = @repo.uri
       @logger  = logger
       @verbose = @env.verbose?
+      @success = false
     end
 
     def before
@@ -447,6 +450,7 @@ class ::Project
           execute
         end
       end
+      success?
     end
 
     def after
@@ -462,6 +466,7 @@ class ::Project
         unless pretend?
           sleep(timeout)
           system(command)
+          @success = $?.success?
         end
         after
       else
@@ -521,6 +526,10 @@ class ::Project
 
     def pretend?
       @env.pretend?
+    end
+
+    def success?
+      @success
     end
 
     def verbosity
@@ -775,7 +784,7 @@ class ::Project
             execute
 
             if print_matrix?
-              print ' %s |' % [ $?.success? ? 'pass' : 'fail' ]
+              print ' %s |' % [ success? ? 'pass' : 'fail' ]
             end
 
           end
