@@ -43,7 +43,7 @@ class ::Project
         self.class.invoke :before, '#{command_name(name)}', env, repos
         @repos.each do |repo|
           @logger.progress!
-          results << command_class('#{name}').new(repo, env, @logger).run
+          results[repo.name] = command_class('#{name}').new(repo, env, @logger).run
         end
         self.class.invoke :after, '#{command_name(name)}', env, repos
 
@@ -78,7 +78,7 @@ class ::Project
     @repos    = Repositories.new(@root, name, @env.included, @env.excluded + excluded_repos)
     @logger   = Logger.new(@env, @repos.count)
     @commands = {}
-    @results  = []
+    @results  = {}
   end
 
   def environment_class
@@ -429,6 +429,7 @@ class ::Project
     attr_reader :path
     attr_reader :uri
     attr_reader :logger
+    attr_reader :results
 
     def initialize(repo, env, logger)
       @repo    = repo
@@ -438,7 +439,7 @@ class ::Project
       @uri     = @repo.uri
       @logger  = logger
       @verbose = @env.verbose?
-      @success = false
+      @results = []
     end
 
     def before
@@ -454,7 +455,7 @@ class ::Project
           execute
         end
       end
-      success?
+      results
     end
 
     def after
@@ -469,14 +470,26 @@ class ::Project
         end
         unless pretend?
           sleep(timeout)
-          system(command)
-          @success = $?.success?
+          system(command) unless skip?
+          @results << status
         end
         after
       else
         if verbose? && !pretend?
           log(command, "SKIPPED! - #{explanation}")
         end
+      end
+    end
+
+    def skip?
+      false
+    end
+
+    def status
+      if skip?
+        :skipped
+      else
+        $? && $?.success? ? :pass : :fail
       end
     end
 
@@ -530,10 +543,6 @@ class ::Project
 
     def pretend?
       @env.pretend?
-    end
-
-    def success?
-      @success
     end
 
     def verbosity
@@ -788,7 +797,7 @@ class ::Project
             execute
 
             if print_matrix?
-              print ' %s |' % [ success? ? 'pass' : 'fail' ]
+              print ' %s |' % [ status ]
             end
 
           end
@@ -949,7 +958,6 @@ module DataMapper
         attr_reader :library
 
         attr_reader :data
-        attr_reader :success
 
         def initialize(data)
           @id       = data['id']
@@ -957,7 +965,7 @@ module DataMapper
           @adapter  = data['adapter' ]['name']
           @library  = data['library' ]['name']
           @data     = data
-          @success  = false
+          @results  = {}
         end
 
         def run
@@ -967,26 +975,38 @@ module DataMapper
             report
           end
           @running = false
-          @success
+          @results
         end
 
         def accept
-          puts "\nACCEPTING: job = #{self.id}, gem = #{library}, platform = #{platform}, adapter = #{adapter}"
           response = JSON.parse(RestClient.post("#{CI::SERVICE_URL}/jobs/accept", { :id => self.id }))
+          config   = "job = #{self.id}, gem = #{library}, platform = #{platform}, adapter = #{adapter}"
+          if response['accepted']
+            puts "\nACCEPTED: #{config}"
+          else
+            puts "\nREJECTED: #{config}"
+          end
           response['accepted']
         end
 
         def execute
-          results  = DataMapper::Project.spec(:include => [library], :rubies => [platform], :adapters => [adapter])
-          @success = results.all? { |success| success }
+          @results  = DataMapper::Project.spec(:include => [library], :rubies => [platform], :adapters => [adapter])
         end
 
         def report
-          RestClient.post("#{CI::SERVICE_URL}/jobs/report", :report => { :job_id => self.id, :green => @success })
+          RestClient.post("#{CI::SERVICE_URL}/jobs/report", :report => { :job_id => self.id, :status => result })
         end
 
         def running?
           @running
+        end
+
+        def result
+          if @results[library]
+            @results[library].first.to_s # we know that we only get one result back
+          else
+            :skipped # HACK
+          end
         end
 
       end # class Job
@@ -1050,9 +1070,16 @@ module DataMapper
 
     class Environment < ::Project::Environment
 
+      attr_reader :available_adapters
+
       def initialize(name, options)
         super
-        @adapters ||= options[:adapters] || (ENV['ADAPTERS'] ? normalize(ENV['ADAPTERS']) : default_adapters)
+        @available_adapters ||= ENV['DM_DEV_ADAPTERS']                 ? normalize(ENV['DM_DEV_ADAPTERS']) : default_available_adapters
+        @adapters           ||= options[:adapters] || (ENV['ADAPTERS'] ? normalize(ENV['ADAPTERS'       ]) : default_adapters)
+      end
+
+      def default_available_adapters
+        default_adapters
       end
 
       def default_adapters
@@ -1064,9 +1091,8 @@ module DataMapper
       end
 
       def adapters(repo)
-        available_adapters = @adapters
-        specific_adapters  = available_adapters.select { |adapter| repo.name =~ /#{adapter}/ }
-        specific_adapters.empty? ? available_adapters : specific_adapters
+        specific_adapters  = @adapters.select { |adapter| repo.name =~ /#{adapter}/ }
+        specific_adapters.empty? ? @adapters : specific_adapters
       end
 
     end
@@ -1148,7 +1174,7 @@ module DataMapper
             execute
 
             if print_matrix?
-              print ' %s |' % [ $?.success? ? 'pass' : 'fail' ]
+              print ' %s |' % [ status ]
             end
           end
           puts if print_matrix?
@@ -1157,6 +1183,10 @@ module DataMapper
 
       def environment
         "#{super} ADAPTER=#{@adapter} TZ=utc"
+      end
+
+      def skip?
+        !env.available_adapters.include?(@adapter)
       end
 
     end
