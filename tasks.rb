@@ -937,7 +937,7 @@ module DataMapper
 
   module CI
 
-    SERVICE_URL = ENV['TESTOR_SERVER'] || 'http://localhost:9292'
+    SERVICE_URL = ENV['TESTOR_SERVER'] || 'http://localhost:3000'
 
     class Client
 
