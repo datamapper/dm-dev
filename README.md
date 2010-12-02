@@ -15,7 +15,7 @@ you're working on a patch that affects multiple DataMapper gems.
 Prerequisites
 -------------
 
-You need to have [rvm](http://rvm.beginrescueend.com/), [bundler](http://github.com/carlhuda/bundler), [thor](http://github.com/wycats/thor), [ruby-github](https://rubygems.org/gems/ruby-github), [addressable](http://addressable.rubyforge.org/) and [jeweler](http://github.com/technicalpickles/jeweler) available on your machine.
+You need to have [rvm](http://rvm.beginrescueend.com/), [bundler](http://github.com/carlhuda/bundler), [thor](http://github.com/wycats/thor), [ruby-github](https://rubygems.org/gems/ruby-github), [addressable](http://addressable.rubyforge.org/), [rest-client](http://rubygems.org/gems/rest-client) and [jeweler](http://github.com/technicalpickles/jeweler) available on your machine.
 
 ### Installing rvm
 
