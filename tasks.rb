@@ -983,7 +983,7 @@ module DataMapper
           response = JSON.parse(RestClient.post("#{CI::SERVICE_URL}/jobs/accept",
             {
               :id     => self.id,
-              :status => @requested_status
+              :status => @requested_status.join(',')
             }
           ))
           config   = "job = #{self.id}, gem = #{library}, platform = #{platform}, adapter = #{adapter}"
@@ -1045,7 +1045,7 @@ module DataMapper
         job_data = JSON.parse(RestClient.get("#{CI::SERVICE_URL}/jobs/next",
           { :params => {
               :previous_jobs => @previous_jobs.join(','),
-              :status        => @requested_status
+              :status        => @requested_status.join(',')
             }
           }
         ))
