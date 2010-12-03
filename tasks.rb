@@ -972,7 +972,7 @@ module DataMapper
         def run
           @running = true
           if accept
-            execute
+            @results = execute
             report
           end
           @running = false
@@ -996,7 +996,8 @@ module DataMapper
         end
 
         def execute
-          @results  = DataMapper::Project.spec(:include => [library], :rubies => [platform], :adapters => [adapter])
+          DataMapper::Project.sync(:include => [library], :rubies => [platform], :adapters => [adapter]) if upstream_modified?
+          DataMapper::Project.spec(:include => [library], :rubies => [platform], :adapters => [adapter])
         end
 
         def report
@@ -1005,6 +1006,11 @@ module DataMapper
 
         def running?
           @running
+        end
+
+        def upstream_modified?
+          # TODO make this more solid with respect to 'skipped' (use SHA1s)
+          @requested_status.empty? || @requested_status.include?('modified')
         end
 
         def result
