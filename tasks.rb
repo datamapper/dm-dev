@@ -959,13 +959,14 @@ module DataMapper
 
         attr_reader :data
 
-        def initialize(data)
-          @id       = data['id']
-          @platform = data['platform']['name']
-          @adapter  = data['adapter' ]['name']
-          @library  = data['library' ]['name']
-          @data     = data
-          @results  = {}
+        def initialize(data, requested_status)
+          @requested_status = requested_status
+          @id               = data['id']
+          @platform         = data['platform']['name']
+          @adapter          = data['adapter' ]['name']
+          @library          = data['library' ]['name']
+          @data             = data
+          @results          = {}
         end
 
         def run
@@ -979,7 +980,12 @@ module DataMapper
         end
 
         def accept
-          response = JSON.parse(RestClient.post("#{CI::SERVICE_URL}/jobs/accept", { :id => self.id }))
+          response = JSON.parse(RestClient.post("#{CI::SERVICE_URL}/jobs/accept",
+            {
+              :id     => self.id,
+              :status => @requested_status
+            }
+          ))
           config   = "job = #{self.id}, gem = #{library}, platform = #{platform}, adapter = #{adapter}"
           if response['accepted']
             puts "\nACCEPTED: #{config}"
@@ -1012,9 +1018,10 @@ module DataMapper
       end # class Job
 
       def initialize(options)
-        @sleep_period   = options[:sleep_period  ] || ENV['TESTOR_SLEEP_PERIOD'  ] || 60
-        @stop_when_done = options[:stop_when_done] || ENV['TESTOR_STOP_WHEN_DONE'] || true
-        @previous_jobs  = [] # TODO remember those
+        @sleep_period     = options[:sleep_period  ] || ENV['TESTOR_SLEEP_PERIOD'  ] || 60
+        @stop_when_done   = options[:stop_when_done] || ENV['TESTOR_STOP_WHEN_DONE'] || true
+        @requested_status = options[:status]         || [] # rely on server defaults
+        @previous_jobs    = [] # TODO remember those
       end
 
       def run
@@ -1035,8 +1042,14 @@ module DataMapper
     private
 
       def next_job
-        job_data = JSON.parse(RestClient.get("#{CI::SERVICE_URL}/jobs/next", { :params => { :previous_jobs => @previous_jobs.join(',') }}))
-        job_data.empty? ? nil : Client::Job.new(job_data)
+        job_data = JSON.parse(RestClient.get("#{CI::SERVICE_URL}/jobs/next",
+          { :params => {
+              :previous_jobs => @previous_jobs.join(','),
+              :status        => @requested_status
+            }
+          }
+        ))
+        job_data.empty? ? nil : Client::Job.new(job_data, @requested_status)
       end
 
     end # class Client
@@ -1112,7 +1125,7 @@ module DataMapper
       end
 
       def ignored_repos
-        %w[ dm-dev data_mapper datamapper.github.com dm-ferret-adapter rails_datamapper dm-rails dm-do-adapter]
+        %w[ dm-dev data_mapper datamapper.github.com rails_datamapper dm-rails dm-do-adapter]
       end
 
       def timeout
@@ -1326,6 +1339,7 @@ module DataMapper
         desc 'client', 'Start a client that fetches and executes DataMapper CI jobs'
         method_option :sleep_period,   :type => :numeric, :aliases => '-w', :desc => 'When no jobs are available, sleep that many seconds before asking again'
         method_option :stop_when_done, :type => :boolean, :aliases => '-x', :desc => 'Stop when no more jobs are available'
+        method_option :status,         :type => :array,   :aliases => '-s', :desc => 'A list of statuses to accept for new jobs (defaults to "modified" and "skipped")'
         def client
           DataMapper::CI::Client.new(options).run
         end
