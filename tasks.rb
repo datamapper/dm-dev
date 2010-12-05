@@ -465,7 +465,7 @@ class ::Project
     def execute
       if executable?
         before
-        unless suppress_log?
+        unless suppress_log? || skip?
           log(command)
         end
         unless pretend?
@@ -623,6 +623,18 @@ class ::Project
 
         def action
           'Pulling'
+        end
+
+        def target_revision
+          env.options[:revision]
+        end
+
+        def revision
+          %x[git rev-parse head].chomp!
+        end
+
+        def skip?
+          target_revision == revision
         end
 
       end
@@ -826,6 +838,18 @@ class ::Project
         !executable? || print_matrix?
       end
 
+      def skip?
+        target_revision && !clean?
+      end
+
+      def target_revision
+        env.options[:revision]
+      end
+
+      def clean?
+        %x[git status] =~ /working directory clean/
+      end
+
     end
 
     class Gem < Rvm
@@ -956,15 +980,19 @@ module DataMapper
         attr_reader :platform
         attr_reader :adapter
         attr_reader :library
+        attr_reader :revision
+        attr_reader :previous_status
 
         attr_reader :data
 
         def initialize(data, requested_status)
           @requested_status = requested_status
           @id               = data['id']
-          @platform         = data['platform']['name']
-          @adapter          = data['adapter' ]['name']
-          @library          = data['library' ]['name']
+          @platform         = data['platform_name']
+          @adapter          = data['adapter_name' ]
+          @library          = data['library_name' ]
+          @revision         = data['revision' ]
+          @previous_status  = data['previous_status' ]
           @data             = data
           @results          = {}
         end
@@ -996,28 +1024,29 @@ module DataMapper
         end
 
         def execute
-          DataMapper::Project.sync(:include => [library], :rubies => [platform], :adapters => [adapter]) if upstream_modified?
-          DataMapper::Project.spec(:include => [library], :rubies => [platform], :adapters => [adapter])
+          permutation = { :include => [library], :rubies => [platform], :adapters => [adapter], :revision => revision }
+          DataMapper::Project.sync(permutation)
+          DataMapper::Project.spec(permutation)
         end
 
         def report
-          RestClient.post("#{CI::SERVICE_URL}/jobs/report", :report => { :job_id => self.id, :status => result })
+          RestClient.post("#{CI::SERVICE_URL}/jobs/report",
+            :report => {
+              :job_id   => self.id,
+              :status   => result,
+              :revision => revision
+            })
         end
 
         def running?
           @running
         end
 
-        def upstream_modified?
-          # TODO make this more solid with respect to 'skipped' (use SHA1s)
-          @requested_status.empty? || @requested_status.include?('modified')
-        end
-
         def result
           if @results[library]
             @results[library].first.to_s # we know that we only get one result back
           else
-            :skipped # HACK
+            'skipped' # HACK
           end
         end
 
