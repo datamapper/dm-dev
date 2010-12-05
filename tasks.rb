@@ -346,6 +346,7 @@ class ::Project
       @pretend         = @options[:pretend             ] || (ENV['PRETEND'           ] == 'true')
       @benchmark       = @options[:benchmark           ] || (ENV['BENCHMARK'         ] == 'true')
       @command_options = @options[:command_options     ] ||  nil
+      @collect_output  = @options[:collect_output      ] || false
     end
 
     def default_bundle_root
@@ -378,6 +379,10 @@ class ::Project
 
     def benchmark?
       @benchmark
+    end
+
+    def collect_output?
+      @collect_output
     end
 
   private
@@ -430,6 +435,7 @@ class ::Project
     attr_reader :uri
     attr_reader :logger
     attr_reader :results
+    attr_reader :output
 
     def initialize(repo, env, logger)
       @repo    = repo
@@ -470,8 +476,8 @@ class ::Project
         end
         unless pretend?
           sleep(timeout)
-          system(command) unless skip?
-          @results << status
+          shell(command) unless skip?
+          @results << { :status => status, :output => output }
         end
         after
       else
@@ -545,6 +551,10 @@ class ::Project
       @env.pretend?
     end
 
+    def collect_output?
+      env.collect_output?
+    end
+
     def verbosity
       verbose? ? verbose : silent
     end
@@ -568,6 +578,14 @@ class ::Project
 
     def log(command = nil, msg = nil)
       logger.log(repo, action, command, msg)
+    end
+
+    def shell(command)
+      if collect_output?
+        @output = %x[#{command}]
+      else
+        system(command)
+      end
     end
 
     class List < ::Project::Command
@@ -1026,14 +1044,15 @@ module DataMapper
         def execute
           permutation = { :include => [library], :rubies => [platform], :adapters => [adapter], :revision => revision }
           DataMapper::Project.sync(permutation)
-          DataMapper::Project.spec(permutation)
+          DataMapper::Project.spec(permutation.merge(:verbose => true, :collect_output => true))
         end
 
         def report
           RestClient.post("#{CI::SERVICE_URL}/jobs/report",
             :report => {
               :job_id   => self.id,
-              :status   => result,
+              :status   => result[:status],
+              :output   => result[:output],
               :revision => revision
             })
         end
@@ -1044,9 +1063,9 @@ module DataMapper
 
         def result
           if @results[library]
-            @results[library].first.to_s # we know that we only get one result back
+            @results[library].first # we know that we only get one result back
           else
-            'skipped' # HACK
+            { :status => 'skipped' } # HACK
           end
         end
 
