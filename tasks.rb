@@ -648,7 +648,7 @@ class ::Project
         end
 
         def revision
-          %x[git rev-parse head].chomp!
+          %x[git rev-parse HEAD].chomp!
         end
 
         def skip?
