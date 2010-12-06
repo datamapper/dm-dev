@@ -1065,7 +1065,7 @@ module DataMapper
           if @results[library]
             @results[library].first # we know that we only get one result back
           else
-            { :status => 'skipped' } # HACK
+            { :status => 'skipped', :output => 'skipped' } # HACK
           end
         end
 
