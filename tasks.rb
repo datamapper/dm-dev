@@ -1003,8 +1003,9 @@ module DataMapper
 
         attr_reader :data
 
-        def initialize(data, requested_status)
+        def initialize(data, requested_status, credentials)
           @requested_status = requested_status
+          @credentials      = credentials
           @id               = data['id']
           @platform         = data['platform_name']
           @adapter          = data['adapter_name' ]
@@ -1028,8 +1029,9 @@ module DataMapper
         def accept
           response = JSON.parse(RestClient.post("#{CI::SERVICE_URL}/jobs/accept",
             {
-              :id     => self.id,
-              :status => @requested_status.join(',')
+              :id          => self.id,
+              :status      => @requested_status.join(','),
+              :credentials => @credentials
             }
           ))
           config   = "job = #{self.id}, gem = #{library}, platform = #{platform}, adapter = #{adapter}"
@@ -1049,11 +1051,12 @@ module DataMapper
 
         def report
           RestClient.post("#{CI::SERVICE_URL}/jobs/report",
-            :report => {
-              :job_id   => self.id,
-              :status   => result[:status],
-              :output   => result[:output],
-              :revision => revision
+            :credentials => @credentials,
+            :report      => {
+              :job_id    => self.id,
+              :status    => result[:status],
+              :output    => result[:output],
+              :revision  => revision
             })
         end
 
@@ -1103,7 +1106,19 @@ module DataMapper
             }
           }
         ))
-        job_data.empty? ? nil : Client::Job.new(job_data, @requested_status)
+        job_data.empty? ? nil : Client::Job.new(job_data, @requested_status, credentials)
+      end
+
+      def credentials
+        { :login => testor_login, :token => testor_token }
+      end
+
+      def testor_login
+        ENV.fetch('TESTOR_LOGIN', nil)
+      end
+
+      def testor_token
+        ENV.fetch('TESTOR_TOKEN', nil)
       end
 
     end # class Client
