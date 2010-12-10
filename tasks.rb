@@ -476,8 +476,10 @@ class ::Project
         end
         unless pretend?
           sleep(timeout)
+          start_time = Time.now
           shell(command) unless skip?
-          @results << { :status => status, :output => output }
+          duration = (Time.now - start_time).to_i
+          @results << { :status => status, :output => output, :duration => duration }
         end
         after
       else
@@ -1054,8 +1056,9 @@ module DataMapper
             :credentials => @credentials,
             :report      => {
               :job_id    => self.id,
-              :status    => result[:status],
-              :output    => result[:output],
+              :status    => result[:status  ],
+              :output    => result[:output  ],
+              :duration  => result[:duration],
               :revision  => revision
             })
         end
