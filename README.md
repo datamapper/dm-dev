@@ -43,7 +43,11 @@ transparently.
 
 ### Installing the required gems
 
-    gem install bundler thor addressable ruby-github
+It's enough to have the following gems installed in the rvm ruby you use
+to run the dm-dev tasks. If you often switch rubies you might want to
+consider installing them into all your rvm rubies.
+
+    gem install bundler thor addressable ruby-github json rest-client
 
 Once those are installed, you have all you need for the DataMapper thor tasks
 to work.
