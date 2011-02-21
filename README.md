@@ -24,8 +24,8 @@ rubies a breeze. Be aware that the following commands may take quite
 some time, depending on your machine.
 
     gem install rvm   # Please follow the instructions
-    rvm install 1.8.7 # You need to run specs on 1.8.7
-    rvm install 1.9.2 # You need to run specs on 1.9.2
+    rvm install 1.8.7 # You should run specs on 1.8.7
+    rvm install 1.9.2 # You should run specs on 1.9.2
     rvm install jruby # Bonus points for running on jruby
     rvm install rbx   # Bonus points for running on rbx
 
