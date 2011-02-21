@@ -32,22 +32,13 @@ some time, depending on your machine.
 Reading through rvm's detailed [documentation](http://rvm.beginrescueend.com/)
 is definitely time well spent too.
 
-Currently, you need to manually make sure that jeweler is installed into any of the rubies you plan to use. This is because the DataMapper rake tasks depend on jeweler and we have to invoke them *before* we can enter a bundled environment.
-
-To install jeweler into multiple rubies, run the following command
-
-    rvm 1.8.7,1.9.2,jruby,rbx gem install jeweler
-
-In the future, there might be a task that will handle this
-transparently.
-
 ### Installing the required gems
 
-It's enough to have the following gems installed in the rvm ruby you use
-to run the dm-dev tasks. If you often switch rubies you might want to
-consider installing them into all your rvm rubies.
+Actually, it's enough to have the following gems installed in the rvm
+ruby you use to run the dm-dev tasks. However, if you sometimes switch
+rubies you might want to have the dm-dev tasks handy for all of them.
 
-    gem install bundler thor addressable ruby-github json rest-client
+    rvm 1.8.7,1.9.2,jruby,rbx gem install jeweler bundler thor addressable ruby-github json rest-client
 
 Once those are installed, you have all you need for the DataMapper thor tasks
 to work.
