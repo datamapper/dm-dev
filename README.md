@@ -15,7 +15,7 @@ you're working on a patch that affects multiple DataMapper gems.
 Prerequisites
 -------------
 
-You need to have [rvm](http://rvm.beginrescueend.com/), [bundler](http://github.com/carlhuda/bundler), [thor](http://github.com/wycats/thor), [ruby-github](https://rubygems.org/gems/ruby-github), [addressable](http://addressable.rubyforge.org/), [rest-client](http://rubygems.org/gems/rest-client) and [jeweler](http://github.com/technicalpickles/jeweler) available on your machine.
+You need to have [rvm](http://rvm.beginrescueend.com/), [bundler](https://github.com/carlhuda/bundler), [thor](https://github.com/wycats/thor), [ruby-github](https://rubygems.org/gems/ruby-github), [addressable](http://addressable.rubyforge.org/), [rest-client](http://rubygems.org/gems/rest-client) and [jeweler](https://github.com/technicalpickles/jeweler) available on your machine.
 
 ### Installing rvm
 
@@ -48,7 +48,7 @@ Installing the DataMapper thor tasks
 
 The easiest way to install the thor tasks is to simply run the following.
 
-    thor install http://github.com/datamapper/dm-dev/raw/master/tasks.rb
+    thor install https://github.com/datamapper/dm-dev/raw/master/tasks.rb
 
 If you don't feel comfortable with executing code loaded from the
 internet, you can also clone the github repo containing the tasks and
@@ -502,7 +502,7 @@ You can achieve this either by simply editing the
 `#{DM_DEV_ROOT}/dm-dev.yml` file by hand, or by running the following
 command:
 
-    thor dm:meta:add -n your_gem_name -u http://github.com/you/and_your_gem
+    thor dm:meta:add -n your_gem_name -u https://github.com/you/and_your_gem
 
 Subsequent operations will take the newly added gem into account,
 given that it provides a `Gemfile` and a `rake spec` spec task.
