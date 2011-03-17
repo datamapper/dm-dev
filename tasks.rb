@@ -877,7 +877,7 @@ class ::Project
       class Install < Gem
 
         def command
-          "#{super} gem build #{gemspec_file}; #{super} gem install #{gem}"
+          "#{super} gem build #{gemspec_file}; #{super} gem install #{gem} --no-ri --no-rdoc"
         end
 
         def action
