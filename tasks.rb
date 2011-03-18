@@ -901,7 +901,7 @@ class ::Project
       def before
         create_gemset = "rvm gemset create #{env.gemset}"
 
-        log    create_gemset if verbose?
+        log    create_gemset if env.gemset && verbose?
         system create_gemset if env.gemset && !pretend?
       end
 
