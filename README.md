@@ -3,14 +3,21 @@ Setting up a DataMapper development environment
 
 Contributing to DataMapper might seem intimidating at first. The variety
 of available gems and github repositories might appear to be an
-impenetrable jungle. Fear not! The following tasks actually make it
-pretty easy to solidly test any kind of patch for DataMapper.
+impenetrable jungle. Fear not! The following tasks help to simplify the
+task of locally testing patches for DataMapper before submitting them.
 
 The following steps will guide you through the process of fetching the
 source and running the specs on multiple rubies (using rvm). The
 provided tasks also make sure that you're always running the specs
 against your local DataMapper source codes. This is very important once
 you're working on a patch that affects multiple DataMapper gems.
+
+Once you've verified your patch locally, submitted it, and had it accepted,
+be sure to check the status of the [DataMapper CI server](http://ci.datamapper.org).
+Check both the project that your patch is for, and all downstream projects.
+(The console output from the spec run can be viewed by clicking the green/red
+status icons on the build detail page, then clicking the 'Console Output' link
+in the left-hand sidebar nav).
 
 Prerequisites
 -------------
