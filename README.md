@@ -513,4 +513,3 @@ command:
 
 Subsequent operations will take the newly added gem into account,
 given that it provides a `Gemfile` and a `rake spec` spec task.
-

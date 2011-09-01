@@ -1452,4 +1452,3 @@ module DataMapper
 end
 
 DM = DataMapper::Project
-
