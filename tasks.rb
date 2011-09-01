@@ -1436,7 +1436,7 @@ module DataMapper
       end
 
       def include_all?(included)
-        include_all_implicitly? || include_all_explicitly?
+        include_all_implicitly?(included) || include_all_explicitly?(included)
       end
 
       def include_all_implicitly?(included)
